@@ -34,6 +34,10 @@ function defaultState() {
 }
 
 function migrateState(old) {
-  // Future migrations go here
-  return { ...defaultState(), ...old, schemaVersion: SCHEMA_VERSION };
+  const base = { ...defaultState(), ...old, schemaVersion: SCHEMA_VERSION };
+  // Backfill sport field on tournaments created before multi-sport support
+  base.tournaments = (base.tournaments || []).map(t =>
+    t.sport ? t : { ...t, sport: 'netball' }
+  );
+  return base;
 }

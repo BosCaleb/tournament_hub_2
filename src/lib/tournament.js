@@ -21,6 +21,7 @@ export function createTournament(overrides = {}) {
     pointsForDraw: 1,
     pointsForLoss: 0,
     tiebreakMethod: 'goal-difference',
+    sport: 'netball',
     adminPinHash: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

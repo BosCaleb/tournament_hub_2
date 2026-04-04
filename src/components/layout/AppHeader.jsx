@@ -1,24 +1,36 @@
-import { Link } from 'react-router-dom';
-import { Sun, Moon, Trophy } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Sun, Moon, Trophy, ArrowLeft, Shield } from 'lucide-react';
 import { useTournamentContext } from '../../context/TournamentContext.jsx';
 import './AppHeader.css';
 
-export function AppHeader({ title, subtitle }) {
+export function AppHeader({ title, subtitle, backPath, isAdmin }) {
   const { state, setTheme } = useTournamentContext();
+  const navigate = useNavigate();
   const isDark = state.theme === 'dark';
 
   return (
     <header className="app-header">
       <div className="container app-header-inner">
-        <Link to="/" className="app-header-brand">
-          <div className="brand-logo">
-            <Trophy size={20} />
-          </div>
-          <div className="brand-text">
-            <span className="brand-name">StatEdge</span>
-            <span className="brand-sub">Netball</span>
-          </div>
-        </Link>
+        <div className="app-header-left">
+          {backPath && (
+            <button
+              className="app-header-back"
+              onClick={() => navigate(backPath)}
+              aria-label="Back"
+            >
+              <ArrowLeft size={16} />
+            </button>
+          )}
+          <Link to="/" className="app-header-brand">
+            <div className="brand-logo">
+              <Trophy size={20} />
+            </div>
+            <div className="brand-text">
+              <span className="brand-name">StatEdge</span>
+              <span className="brand-sub">Sports</span>
+            </div>
+          </Link>
+        </div>
 
         {(title || subtitle) && (
           <div className="app-header-title">
@@ -28,6 +40,12 @@ export function AppHeader({ title, subtitle }) {
         )}
 
         <div className="app-header-actions">
+          {isAdmin && (
+            <div className="admin-indicator" title="Admin mode">
+              <Shield size={13} />
+              <span>Admin</span>
+            </div>
+          )}
           <button
             className="theme-toggle"
             onClick={() => setTheme(isDark ? 'light' : 'dark')}

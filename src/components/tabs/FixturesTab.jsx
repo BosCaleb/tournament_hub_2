@@ -9,7 +9,7 @@ import { EmptyState } from '../ui/EmptyState.jsx';
 import { Badge } from '../ui/Badge.jsx';
 import './FixturesTab.css';
 
-export function FixturesTab({ tournament, dispatch, toast }) {
+export function FixturesTab({ tournament, dispatch, toast, isAdmin = false }) {
   const [activePool, setActivePool] = useState(tournament.pools[0]?.id || null);
   const [showAdd, setShowAdd] = useState(false);
   const [editFixture, setEditFixture] = useState(null);
@@ -48,8 +48,8 @@ export function FixturesTab({ tournament, dispatch, toast }) {
       <div className="container" style={{ paddingBlock: 'var(--space-8)' }}>
         <EmptyState
           icon={<Plus size={28} />}
-          title="No pools set up"
-          description="Go to the Admin tab to create pools and assign teams before generating fixtures."
+          title="No fixtures yet"
+          description={isAdmin ? 'Go to the Admin tab to create pools and assign teams before generating fixtures.' : 'No fixtures have been set up for this tournament yet.'}
         />
       </div>
     );
@@ -75,36 +75,38 @@ export function FixturesTab({ tournament, dispatch, toast }) {
           ))}
         </div>
 
-        {/* Actions bar */}
-        <div className="fixtures-actions">
-          <div className="fixtures-actions-left">
-            <Button variant="accent" size="sm" icon={<Zap size={14} />} onClick={handleGenerate}
-              disabled={!currentPool || currentPool.teamIds.length < 2}>
-              Generate Round-Robin
-            </Button>
-            <Button variant="secondary" size="sm" icon={<Plus size={14} />} onClick={() => setShowAdd(true)}>
-              Add Fixture
-            </Button>
+        {/* Actions bar — admin only */}
+        {isAdmin && (
+          <div className="fixtures-actions">
+            <div className="fixtures-actions-left">
+              <Button variant="accent" size="sm" icon={<Zap size={14} />} onClick={handleGenerate}
+                disabled={!currentPool || currentPool.teamIds.length < 2}>
+                Generate Round-Robin
+              </Button>
+              <Button variant="secondary" size="sm" icon={<Plus size={14} />} onClick={() => setShowAdd(true)}>
+                Add Fixture
+              </Button>
+            </div>
+            <div className="fixtures-actions-right">
+              <Button variant="ghost" size="sm" icon={<RotateCcw size={14} />} onClick={() => setShowClearConfirm(true)}>
+                Clear Unplayed
+              </Button>
+            </div>
           </div>
-          <div className="fixtures-actions-right">
-            <Button variant="ghost" size="sm" icon={<RotateCcw size={14} />} onClick={() => setShowClearConfirm(true)}>
-              Clear Unplayed
-            </Button>
-          </div>
-        </div>
+        )}
 
         {/* Fixture list */}
         {fixtures.length === 0 ? (
           <EmptyState
             icon={<CheckCircle size={28} />}
             title="No fixtures"
-            description="Generate round-robin fixtures or add them manually."
-            action={
+            description={isAdmin ? 'Generate round-robin fixtures or add them manually.' : 'No fixtures scheduled for this pool yet.'}
+            action={isAdmin ? (
               <Button variant="accent" size="sm" icon={<Zap size={14} />} onClick={handleGenerate}
                 disabled={!currentPool || currentPool.teamIds.length < 2}>
                 Generate Fixtures
               </Button>
-            }
+            ) : null}
           />
         ) : (
           <div className="fixture-list">
@@ -121,6 +123,7 @@ export function FixturesTab({ tournament, dispatch, toast }) {
                     key={f.id}
                     fixture={f}
                     tournament={tournament}
+                    isAdmin={isAdmin}
                     onEdit={() => setEditFixture(f)}
                     onDelete={() => setDeleteId(f.id)}
                     onScore={() => setScoreFixture(f)}
@@ -202,7 +205,7 @@ export function FixturesTab({ tournament, dispatch, toast }) {
   );
 }
 
-function FixtureRow({ fixture, tournament, onEdit, onDelete, onScore }) {
+function FixtureRow({ fixture, tournament, isAdmin, onEdit, onDelete, onScore }) {
   const home = tournament.teams.find(t => t.id === fixture.homeTeamId);
   const away = tournament.teams.find(t => t.id === fixture.awayTeamId);
   const homeWon = fixture.played && fixture.homeScore > fixture.awayScore;
@@ -234,17 +237,19 @@ function FixtureRow({ fixture, tournament, onEdit, onDelete, onScore }) {
           {fixture.played && <Badge variant="success" size="sm">Played</Badge>}
         </div>
       </div>
-      <div className="fixture-actions">
-        <button className="fx-action-btn fx-score-btn" onClick={onScore} title="Enter score">
-          <CheckCircle size={15} />
-        </button>
-        <button className="fx-action-btn" onClick={onEdit} title="Edit details">
-          <Edit2 size={14} />
-        </button>
-        <button className="fx-action-btn fx-delete-btn" onClick={onDelete} title="Delete">
-          <Trash2 size={14} />
-        </button>
-      </div>
+      {isAdmin && (
+        <div className="fixture-actions">
+          <button className="fx-action-btn fx-score-btn" onClick={onScore} title="Enter score">
+            <CheckCircle size={15} />
+          </button>
+          <button className="fx-action-btn" onClick={onEdit} title="Edit details">
+            <Edit2 size={14} />
+          </button>
+          <button className="fx-action-btn fx-delete-btn" onClick={onDelete} title="Delete">
+            <Trash2 size={14} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

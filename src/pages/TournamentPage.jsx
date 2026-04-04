@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Calendar, BarChart3, Trophy, Users,
-  TrendingUp, Settings, Tv
+  TrendingUp, Settings, ArrowLeft
 } from 'lucide-react';
 import { useTournament } from '../context/TournamentContext.jsx';
 import { AppHeader } from '../components/layout/AppHeader.jsx';
@@ -21,33 +21,40 @@ import { PlayersTab } from '../components/tabs/PlayersTab.jsx';
 import { StatsTab } from '../components/tabs/StatsTab.jsx';
 import { AdminTab } from '../components/tabs/AdminTab.jsx';
 
-export function TournamentPage() {
-  const { id } = useParams();
+/** isAdmin=true  → full admin view (all tabs, edit controls)
+ *  isAdmin=false → read-only viewer (no Admin tab, no edit controls) */
+export function TournamentPage({ isAdmin = false }) {
+  const { id, sport } = useParams();
+  const navigate = useNavigate();
   const { tournament, dispatch } = useTournament(id);
   const [activeTab, setActiveTab] = useState('overview');
   const toast = useToast();
 
-  if (!tournament) return <Navigate to="/" replace />;
+  const backPath = isAdmin ? '/admin/dashboard' : `/sports/${sport || tournament?.sport || 'netball'}`;
+
+  if (!tournament) return <Navigate to={isAdmin ? '/admin/dashboard' : '/sports'} replace />;
 
   const stats = getTournamentStats(tournament);
 
   const tabs = [
-    { id: 'overview',  label: 'Overview',  icon: <LayoutDashboard size={15} /> },
-    { id: 'fixtures',  label: 'Fixtures',  icon: <Calendar size={15} />, badge: stats.remainingFixtures || null },
-    { id: 'standings', label: 'Standings', icon: <BarChart3 size={15} /> },
-    { id: 'playoffs',  label: 'Playoffs',  icon: <Trophy size={15} /> },
-    { id: 'players',   label: 'Players',   icon: <Users size={15} />, badge: stats.totalPlayers || null },
-    { id: 'stats',     label: 'Statistics',icon: <TrendingUp size={15} /> },
-    { id: 'admin',     label: 'Admin',     icon: <Settings size={15} /> },
+    { id: 'overview',  label: 'Overview',   icon: <LayoutDashboard size={15} /> },
+    { id: 'fixtures',  label: 'Fixtures',   icon: <Calendar size={15} />, badge: stats.remainingFixtures || null },
+    { id: 'standings', label: 'Standings',  icon: <BarChart3 size={15} /> },
+    { id: 'playoffs',  label: 'Playoffs',   icon: <Trophy size={15} /> },
+    { id: 'players',   label: 'Players',    icon: <Users size={15} />, badge: stats.totalPlayers || null },
+    { id: 'stats',     label: 'Statistics', icon: <TrendingUp size={15} /> },
+    ...(isAdmin ? [{ id: 'admin', label: 'Admin', icon: <Settings size={15} /> }] : []),
   ];
 
-  const tabProps = { tournament, dispatch, toast };
+  const tabProps = { tournament, dispatch, toast, isAdmin };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <AppHeader
         title={tournament.name}
         subtitle={[tournament.ageGroup, tournament.organizingBody].filter(Boolean).join(' · ')}
+        backPath={backPath}
+        isAdmin={isAdmin}
       />
 
       <TabNav tabs={tabs} active={activeTab} onChange={setActiveTab} />
@@ -59,7 +66,7 @@ export function TournamentPage() {
         {activeTab === 'playoffs'  && <PlayoffsTab  {...tabProps} />}
         {activeTab === 'players'   && <PlayersTab   {...tabProps} />}
         {activeTab === 'stats'     && <StatsTab     {...tabProps} />}
-        {activeTab === 'admin'     && <AdminTab     {...tabProps} />}
+        {activeTab === 'admin' && isAdmin && <AdminTab {...tabProps} />}
       </main>
 
       <Footer />

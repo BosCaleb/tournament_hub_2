@@ -6,6 +6,17 @@
  * @typedef {'scheduled'|'live'|'completed'} FixtureStatus
  */
 
+export const SPORTS = [
+  { id: 'netball',    label: 'Netball',    icon: '🏐', available: true,  description: 'Full tournament management for SA high school netball' },
+  { id: 'football',   label: 'Football',   icon: '⚽', available: false, description: 'Coming soon' },
+  { id: 'basketball', label: 'Basketball', icon: '🏀', available: false, description: 'Coming soon' },
+  { id: 'rugby',      label: 'Rugby',      icon: '🏉', available: false, description: 'Coming soon' },
+  { id: 'hockey',     label: 'Hockey',     icon: '🏑', available: false, description: 'Coming soon' },
+  { id: 'cricket',    label: 'Cricket',    icon: '🏏', available: false, description: 'Coming soon' },
+  { id: 'athletics',  label: 'Athletics',  icon: '🏃', available: false, description: 'Coming soon' },
+  { id: 'swimming',   label: 'Swimming',   icon: '🏊', available: false, description: 'Coming soon' },
+];
+
 export const NETBALL_POSITIONS = ['GS','GA','WA','C','WD','GD','GK','SUB'];
 export const SA_PROVINCES = [
   { code: 'GP', name: 'Gauteng' },

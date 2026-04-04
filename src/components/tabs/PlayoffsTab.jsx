@@ -6,7 +6,7 @@ import { Modal } from '../ui/Modal.jsx';
 import { EmptyState } from '../ui/EmptyState.jsx';
 import './PlayoffsTab.css';
 
-export function PlayoffsTab({ tournament, dispatch, toast }) {
+export function PlayoffsTab({ tournament, dispatch, toast, isAdmin = false }) {
   const [scoreMatch, setScoreMatch] = useState(null);
   const [teamsPerPool, setTeamsPerPool] = useState(2);
 
@@ -39,29 +39,37 @@ export function PlayoffsTab({ tournament, dispatch, toast }) {
     return (
       <div className="playoffs-tab">
         <div className="container">
-          <div className="playoffs-generate-panel">
-            <Trophy size={48} className="generate-icon" />
-            <h2>Generate Playoff Bracket</h2>
-            <p>Select how many teams per pool qualify for the playoffs, then generate the bracket.</p>
-            <div className="generate-controls">
-              <label>Teams per pool qualifying:</label>
-              <div className="teams-per-pool-btns">
-                {[1,2,3,4].map(n => (
-                  <button
-                    key={n}
-                    className={`tpp-btn ${teamsPerPool === n ? 'tpp-btn-active' : ''}`}
-                    onClick={() => setTeamsPerPool(n)}
-                  >
-                    {n}
-                  </button>
-                ))}
+          {isAdmin ? (
+            <div className="playoffs-generate-panel">
+              <Trophy size={48} className="generate-icon" />
+              <h2>Generate Playoff Bracket</h2>
+              <p>Select how many teams per pool qualify for the playoffs, then generate the bracket.</p>
+              <div className="generate-controls">
+                <label>Teams per pool qualifying:</label>
+                <div className="teams-per-pool-btns">
+                  {[1,2,3,4].map(n => (
+                    <button
+                      key={n}
+                      className={`tpp-btn ${teamsPerPool === n ? 'tpp-btn-active' : ''}`}
+                      onClick={() => setTeamsPerPool(n)}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
               </div>
+              <Button variant="accent" size="lg" icon={<Zap size={18} />} onClick={handleGenerate}
+                disabled={tournament.pools.length === 0}>
+                Generate Bracket
+              </Button>
             </div>
-            <Button variant="accent" size="lg" icon={<Zap size={18} />} onClick={handleGenerate}
-              disabled={tournament.pools.length === 0}>
-              Generate Bracket
-            </Button>
-          </div>
+          ) : (
+            <div className="playoffs-generate-panel">
+              <Trophy size={48} className="generate-icon" />
+              <h2>Playoffs Not Started</h2>
+              <p>The playoff bracket hasn't been generated yet. Check back once pool play is complete.</p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -83,13 +91,15 @@ export function PlayoffsTab({ tournament, dispatch, toast }) {
       <div className="container">
         <div className="playoffs-header">
           <h2 className="playoffs-title">Playoff Bracket</h2>
-          <Button variant="ghost" size="sm" onClick={() => {
-            if (window.confirm('Reset the playoff bracket? This cannot be undone.')) {
-              dispatch({ type: 'SET_PLAYOFFS', payload: { tournamentId: tournament.id, playoffs: [] } });
-            }
-          }}>
-            Reset Bracket
-          </Button>
+          {isAdmin && (
+            <Button variant="ghost" size="sm" onClick={() => {
+              if (window.confirm('Reset the playoff bracket? This cannot be undone.')) {
+                dispatch({ type: 'SET_PLAYOFFS', payload: { tournamentId: tournament.id, playoffs: [] } });
+              }
+            }}>
+              Reset Bracket
+            </Button>
+          )}
         </div>
 
         <div className="bracket-wrapper">
@@ -105,7 +115,8 @@ export function PlayoffsTab({ tournament, dispatch, toast }) {
                       key={match.id}
                       match={match}
                       tournament={tournament}
-                      onClick={() => setScoreMatch(match)}
+                      isAdmin={isAdmin}
+                      onClick={isAdmin ? () => setScoreMatch(match) : undefined}
                     />
                   ))}
                 </div>
@@ -120,12 +131,13 @@ export function PlayoffsTab({ tournament, dispatch, toast }) {
             <BracketMatch
               match={thirdPlaceMatch}
               tournament={tournament}
-              onClick={() => setScoreMatch(thirdPlaceMatch)}
+              isAdmin={isAdmin}
+              onClick={isAdmin ? () => setScoreMatch(thirdPlaceMatch) : undefined}
             />
           </div>
         )}
 
-        {scoreMatch && (
+        {scoreMatch && isAdmin && (
           <PlayoffScoreModal
             match={scoreMatch}
             tournament={tournament}
@@ -138,7 +150,7 @@ export function PlayoffsTab({ tournament, dispatch, toast }) {
   );
 }
 
-function BracketMatch({ match, tournament, onClick }) {
+function BracketMatch({ match, tournament, isAdmin, onClick }) {
   const home = match.homeTeamId ? tournament.teams.find(t => t.id === match.homeTeamId) : null;
   const away = match.awayTeamId ? tournament.teams.find(t => t.id === match.awayTeamId) : null;
   const homeWon = match.played && match.homeScore > match.awayScore;
@@ -155,7 +167,7 @@ function BracketMatch({ match, tournament, onClick }) {
         <span className="bm-name">{away?.name || 'TBD'}</span>
         {match.played && <span className={`bm-score ${awayWon ? 'bm-score-win' : ''}`}>{match.awayScore}</span>}
       </div>
-      {!match.played && home && away && (
+      {isAdmin && !match.played && home && away && (
         <div className="bm-click-hint">Click to enter score</div>
       )}
     </div>

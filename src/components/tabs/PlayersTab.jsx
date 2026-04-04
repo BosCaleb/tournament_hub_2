@@ -9,7 +9,7 @@ import { NETBALL_POSITIONS, POSITION_COLORS } from '../../lib/types.js';
 import { downloadCSV, parseCSV } from '../../lib/utils.js';
 import './PlayersTab.css';
 
-export function PlayersTab({ tournament, dispatch, toast }) {
+export function PlayersTab({ tournament, dispatch, toast, isAdmin = false }) {
   const [filterTeam, setFilterTeam] = useState('all');
   const [filterPos, setFilterPos] = useState('all');
   const [search, setSearch] = useState('');
@@ -90,17 +90,21 @@ export function PlayersTab({ tournament, dispatch, toast }) {
             {NETBALL_POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
           </select>
           <div className="players-filter-actions">
-            <Button variant="accent" size="sm" icon={<Plus size={14} />} onClick={() => setShowAdd(true)}>
-              Add Player
-            </Button>
+            {isAdmin && (
+              <Button variant="accent" size="sm" icon={<Plus size={14} />} onClick={() => setShowAdd(true)}>
+                Add Player
+              </Button>
+            )}
             <Button variant="secondary" size="sm" icon={<Download size={14} />} onClick={handleExport}>
               Export
             </Button>
-            <label className="btn btn-secondary btn-sm" style={{ cursor: 'pointer' }}>
-              <Upload size={14} />
-              <span>Import CSV</span>
-              <input type="file" accept=".csv" style={{ display: 'none' }} onChange={handleImport} />
-            </label>
+            {isAdmin && (
+              <label className="btn btn-secondary btn-sm" style={{ cursor: 'pointer' }}>
+                <Upload size={14} />
+                <span>Import CSV</span>
+                <input type="file" accept=".csv" style={{ display: 'none' }} onChange={handleImport} />
+              </label>
+            )}
           </div>
         </div>
 

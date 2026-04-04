@@ -1,0 +1,211 @@
+/* ── Tournament List Page (Viewer) ───────────────────────── */
+.tlist-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.tlist-main {
+  flex: 1;
+  padding-block: var(--space-8) var(--space-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--transition-fast);
+}
+.back-link:hover { color: var(--color-text); }
+
+.tlist-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tlist-sport-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--brand-gold);
+  letter-spacing: 0.04em;
+}
+.tlist-sport-icon { font-size: 1.2rem; }
+
+.tlist-title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.tlist-sub {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* Search */
+.tlist-search-wrap {
+  position: relative;
+  max-width: 360px;
+}
+.tlist-search-icon {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+.tlist-search {
+  width: 100%;
+  padding: var(--space-2) var(--space-3) var(--space-2) calc(var(--space-3) * 2 + 15px);
+  font-size: var(--text-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+.tlist-search:focus { border-color: var(--brand-gold); }
+
+/* Empty */
+.tlist-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-16) 0;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+.tlist-empty h2 { font-family: var(--font-display); color: var(--color-text); margin: 0; }
+.tlist-empty p { margin: 0; max-width: 320px; }
+
+/* Grid */
+.tlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-5);
+}
+
+/* Viewer Card */
+.viewer-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  animation: fadeIn var(--transition-slow) ease both;
+}
+.viewer-card:hover {
+  border-color: var(--card-accent, var(--brand-gold));
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.viewer-card-accent {
+  height: 4px;
+  background: var(--card-accent, var(--brand-gold));
+}
+
+.viewer-card-body { padding: var(--space-5); flex: 1; }
+
+.viewer-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.viewer-card-logo {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.viewer-card-badges { display: flex; gap: var(--space-1); flex-wrap: wrap; }
+
+.viewer-card-name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--color-text);
+  margin: 0 0 var(--space-1);
+}
+
+.viewer-card-org {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-1);
+}
+
+.viewer-card-venue {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-2);
+}
+
+.viewer-card-dates {
+  display: flex; align-items: center; gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-4);
+}
+
+.viewer-card-stats {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.v-stat { display: flex; flex-direction: column; }
+.v-stat-val { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 700; color: var(--color-text); line-height: 1; }
+.v-stat-label { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 2px; }
+
+.viewer-card-progress { }
+.vcp-bar { height: 4px; background: var(--color-border); border-radius: 2px; overflow: hidden; }
+.vcp-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+
+.viewer-card-footer {
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.viewer-card-open {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+.viewer-card:hover .viewer-card-open {
+  color: var(--card-accent, var(--brand-gold));
+}
