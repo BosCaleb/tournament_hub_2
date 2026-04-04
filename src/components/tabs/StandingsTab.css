@@ -1,0 +1,127 @@
+.standings-tab { padding-block: var(--space-8); }
+.standings-tab .container { display: flex; flex-direction: column; gap: var(--space-8); }
+
+.standings-pool-section { }
+.standings-pool-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+.standings-pool-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+.standings-empty { color: var(--color-text-muted); font-size: var(--text-sm); padding: var(--space-6); text-align: center; }
+
+.standings-table-wrap {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.standings-table {
+  font-size: var(--text-sm);
+  width: 100%;
+}
+.standings-table th {
+  background: var(--color-bg-alt);
+  padding: var(--space-3) var(--space-4);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+  cursor: help;
+}
+.standings-table th.col-team { text-align: left; }
+.standings-table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: center;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  vertical-align: middle;
+}
+.standings-table tr:last-child td { border-bottom: none; }
+.standings-table tbody tr {
+  transition: background var(--transition-fast);
+}
+.standings-table tbody tr:hover { background: var(--color-surface-2); }
+
+.row-leader { background: var(--brand-gold-dim) !important; }
+.row-qualifier td:first-child { border-left: 3px solid var(--brand-gold); }
+
+.col-pos { width: 48px; }
+.pos-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: var(--radius-md);
+  font-weight: 700; font-size: var(--text-sm);
+  background: var(--color-bg-alt); color: var(--color-text-muted);
+}
+.pos-1 { background: var(--brand-gold); color: var(--brand-navy); }
+.pos-2 { background: #C0C0C0; color: #333; }
+.pos-3 { background: #CD7F32; color: white; }
+
+.col-team { text-align: left !important; min-width: 160px; }
+.team-cell { display: flex; align-items: center; gap: var(--space-3); }
+.team-color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.team-cell-name { font-weight: 600; color: var(--color-text); }
+.team-cell-school { font-size: var(--text-xs); color: var(--color-text-muted); display: none; }
+@media (min-width: 768px) { .team-cell-school { display: block; } }
+
+.col-w { color: var(--color-win); font-weight: 600; }
+.col-l { color: var(--color-loss); font-weight: 600; }
+.gd-pos { color: var(--color-win); font-weight: 600; }
+.gd-neg { color: var(--color-loss); }
+.col-pts { }
+.pts-number {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  background: var(--brand-navy); color: white;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display); font-size: var(--text-base); font-weight: 700;
+}
+[data-theme="dark"] .pts-number { background: var(--brand-gold); color: var(--brand-navy); }
+
+.col-form { min-width: 120px; }
+.form-strip { display: flex; gap: 3px; justify-content: center; }
+
+.standings-legend {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-2);
+  border-top: 1px solid var(--color-border);
+  display: flex; gap: var(--space-4);
+}
+.legend-item { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--color-text-muted); }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+.legend-qualifier { background: var(--brand-gold); }
+
+/* Chart */
+.goals-chart {
+  margin-top: var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  padding: var(--space-5);
+}
+.chart-title {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.03em;
+  margin-bottom: var(--space-4);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .standings-table th:nth-child(n+7):not(.col-pts):not(:last-child) { display: none; }
+  .standings-table td:nth-child(n+7):not(:nth-last-child(2)):not(:last-child) { display: none; }
+}

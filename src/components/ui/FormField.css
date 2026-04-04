@@ -1,0 +1,45 @@
+.form-field { display: flex; flex-direction: column; gap: var(--space-2); }
+.form-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+.form-required { color: var(--color-danger); }
+.form-hint { font-size: var(--text-xs); color: var(--color-text-muted); }
+.form-error-msg { font-size: var(--text-xs); color: var(--color-danger); font-weight: 500; }
+
+.input {
+  width: 100%;
+  height: 40px;
+  padding: 0 var(--space-4);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  appearance: none;
+  -webkit-appearance: none;
+}
+.input::placeholder { color: var(--color-text-subtle); }
+.input:focus {
+  outline: none;
+  border-color: var(--brand-gold);
+  box-shadow: 0 0 0 3px var(--brand-gold-dim);
+}
+.input:disabled { opacity: 0.5; cursor: not-allowed; background: var(--color-bg-alt); }
+.form-field-error .input { border-color: var(--color-danger); }
+.form-field-error .input:focus { box-shadow: 0 0 0 3px hsl(0 72% 50% / 0.15); }
+
+.textarea { height: auto; min-height: 80px; padding: var(--space-3) var(--space-4); resize: vertical; }
+
+select.input {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%235A6F87' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 36px;
+  cursor: pointer;
+}

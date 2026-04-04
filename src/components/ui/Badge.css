@@ -1,0 +1,35 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.badge-sm  { font-size: 10px; padding: 2px 7px; }
+.badge-md  { font-size: var(--text-xs); padding: 3px 10px; }
+.badge-lg  { font-size: var(--text-sm); padding: 4px 12px; }
+
+.badge-default     { background: var(--color-bg-alt); color: var(--color-text-muted); }
+.badge-primary     { background: var(--brand-navy); color: #fff; }
+.badge-accent      { background: var(--brand-gold); color: var(--brand-navy); }
+.badge-success     { background: var(--color-win-bg); color: var(--color-win); }
+.badge-warning     { background: var(--color-draw-bg); color: var(--color-draw); }
+.badge-danger      { background: var(--color-loss-bg); color: var(--color-loss); }
+.badge-info        { background: var(--color-info-bg); color: var(--color-info); }
+
+.badge-status-scheduled { background: var(--color-info-bg);    color: var(--color-scheduled); }
+.badge-status-live      { background: var(--color-loss-bg);    color: var(--color-live); animation: pulse 1.5s ease infinite; }
+.badge-status-completed { background: var(--color-win-bg);     color: var(--color-completed); }
+
+/* Form guide badges */
+.form-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: var(--radius-sm);
+  font-size: 10px; font-weight: 700; letter-spacing: 0;
+  font-family: var(--font-display);
+}
+.form-badge-win  { background: var(--color-win);  color: #fff; }
+.form-badge-draw { background: var(--color-draw); color: #fff; }
+.form-badge-loss { background: var(--color-loss); color: #fff; }
+.form-badge-default { background: var(--color-bg-alt); color: var(--color-text-muted); }

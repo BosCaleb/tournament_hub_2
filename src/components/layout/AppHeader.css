@@ -1,0 +1,67 @@
+.app-header {
+  background: var(--brand-navy);
+  border-bottom: 3px solid var(--brand-gold);
+  height: var(--header-height);
+  position: sticky; top: 0; z-index: var(--z-sticky);
+  box-shadow: var(--shadow-lg);
+}
+.app-header-inner {
+  height: 100%;
+  display: flex; align-items: center; gap: var(--space-6);
+}
+.app-header-brand {
+  display: flex; align-items: center; gap: var(--space-3);
+  text-decoration: none; flex-shrink: 0;
+}
+.brand-logo {
+  width: 36px; height: 36px;
+  background: var(--brand-gold);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--brand-navy);
+  flex-shrink: 0;
+}
+.brand-text { display: flex; flex-direction: column; line-height: 1; }
+.brand-name {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--brand-gold);
+  letter-spacing: 0.05em;
+}
+.brand-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.app-header-title {
+  flex: 1;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.header-tournament-name {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  color: white;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.header-tournament-sub {
+  font-size: var(--text-xs);
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.05em;
+}
+.app-header-actions { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; }
+.theme-toggle {
+  background: none; border: none;
+  width: 36px; height: 36px;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.65);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  cursor: pointer;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.1); color: white; }

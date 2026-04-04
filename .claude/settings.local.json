@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Read(//c/Users/bosma/.claude/projects/c--Users-bosma-Documents-repository-statedge-tourn-tournament-hub-2/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\bosma\\.claude\\projects\\c--Users-bosma-Documents-repository-statedge-tourn-tournament-hub-2\\memory"
+    ]
+  }
+}
