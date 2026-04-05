@@ -17,6 +17,13 @@
     "rewrite": "/index.html",
     "exclude": ["/assets/*", "/*.{css,js,png,ico,svg,woff2,json}"]
   },
+  "mimeTypes": {
+    ".js": "application/javascript",
+    ".mjs": "application/javascript",
+    ".css": "text/css",
+    ".svg": "image/svg+xml",
+    ".woff2": "font/woff2"
+  },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "SAMEORIGIN",
