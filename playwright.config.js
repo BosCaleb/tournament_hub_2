@@ -1,4 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
+import { config } from 'dotenv';
+config(); // load .env so VITE_SUPABASE_* are available in afterEach cleanup
 
 export default defineConfig({
   testDir: './e2e',

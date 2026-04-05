@@ -133,13 +133,31 @@ test.describe('Admin auth', () => {
 
 // ─── Full admin flow ──────────────────────────────────────────────────────────
 
+// Delete test tournaments from Supabase so runs don't accumulate stale data.
+async function cleanupTestTournaments() {
+  const url = process.env.VITE_SUPABASE_URL;
+  const key = process.env.VITE_SUPABASE_ANON_KEY;
+  if (!url || !key) return; // no-op when Supabase isn't configured
+  try {
+    await fetch(`${url}/rest/v1/statedge_hub_tournaments?name=eq.Test Cup 2025`, {
+      method: 'DELETE',
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+    });
+  } catch { /* ignore — test cleanup is best-effort */ }
+}
+
 test.describe('Admin — create and view tournament', () => {
   test.beforeEach(async ({ page }) => {
+    await cleanupTestTournaments();
     await page.goto('/');
     await page.evaluate(() => {
       localStorage.clear();
       sessionStorage.setItem('statedge_admin_session', 'true');
     });
+  });
+
+  test.afterEach(async () => {
+    await cleanupTestTournaments();
   });
 
   test('create a tournament and verify it appears in the list', async ({ page }) => {
@@ -150,8 +168,8 @@ test.describe('Admin — create and view tournament', () => {
     await page.locator('input[placeholder*="Agon"]').fill('Test Cup 2025');
     await page.locator('button[type="submit"]:has-text("Create Tournament")').click();
 
-    // Should appear in the dashboard
-    await expect(page.locator('text=Test Cup 2025')).toBeVisible();
+    // Should appear in the dashboard (.first() guards against stale Supabase rows on retry)
+    await expect(page.locator('text=Test Cup 2025').first()).toBeVisible();
   });
 
   test('open tournament and verify all 7 tabs are present for admin', async ({ page }) => {
