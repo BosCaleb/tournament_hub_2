@@ -139,7 +139,7 @@ async function cleanupTestTournaments() {
   const key = process.env.VITE_SUPABASE_ANON_KEY;
   if (!url || !key) return; // no-op when Supabase isn't configured
   try {
-    await fetch(`${url}/rest/v1/statedge_hub_tournaments?name=eq.Test Cup 2025`, {
+    await fetch(`${url}/rest/v1/statedge_hub_tournaments?name=eq.Test%20Cup%202025`, {
       method: 'DELETE',
       headers: { apikey: key, Authorization: `Bearer ${key}` },
     });
