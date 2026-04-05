@@ -140,12 +140,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download dist artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-
       - name: Deploy to Azure
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -154,7 +148,9 @@ jobs:
           action: upload
           app_location: /
           output_location: dist
-          skip_app_build: true
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
   # ── Close PR environment ─────────────────────────────────────────────────────
   close_pull_request_job:
