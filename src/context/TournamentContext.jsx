@@ -1,8 +1,10 @@
-import { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback, useRef, useState } from 'react';
 import { loadState, saveState } from '../lib/storage.js';
 import { generateId } from '../lib/utils.js';
 import { createTournament } from '../lib/tournament.js';
 import { debounce } from '../lib/utils.js';
+import { loadTournaments, upsertTournament, deleteTournament, subscribeTournament } from '../lib/db.js';
+import { isSupabaseEnabled } from '../lib/supabase.js';
 
 const TournamentContext = createContext(null);
 
@@ -340,6 +342,10 @@ export function reducer(state, action) {
         ...t, deletedItems: { teams: [], fixtures: [], players: [] },
       }));
 
+    // ─── Supabase hydration ────────────────────────────────────
+    case 'HYDRATE':
+      return { ...state, tournaments: action.payload };
+
     default:
       return state;
   }
@@ -355,21 +361,59 @@ function patchTournament(state, id, fn) {
 }
 
 export function TournamentProvider({ children }) {
+  // Start from localStorage so the UI is instant on every revisit
   const [state, dispatch] = useReducer(reducer, null, loadState);
+  const [dbReady, setDbReady] = useState(!isSupabaseEnabled);
 
-  // Apply theme
+  // ── On mount: pull from Supabase and replace local state ──────────────────
+  useEffect(() => {
+    if (!isSupabaseEnabled) return;
+
+    loadTournaments().then(tournaments => {
+      if (tournaments !== null) {
+        dispatch({ type: 'HYDRATE', payload: tournaments });
+      }
+      setDbReady(true);
+    });
+  }, []);
+
+  // ── Apply theme ────────────────────────────────────────────────────────────
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', state.theme);
   }, [state.theme]);
 
-  // Debounced save
-  const debouncedSave = useRef(debounce(saveState, 400)).current;
-  useEffect(() => { debouncedSave(state); }, [state]);
+  // ── Save to localStorage (always — fast read on next open) ─────────────────
+  const debouncedLocalSave = useRef(debounce(saveState, 400)).current;
+  useEffect(() => { debouncedLocalSave(state); }, [state]);
+
+  // ── Sync changed/deleted tournaments to Supabase ───────────────────────────
+  const prevTournamentsRef = useRef(state.tournaments);
+
+  useEffect(() => {
+    if (!dbReady || !isSupabaseEnabled) return;
+
+    const prev = prevTournamentsRef.current;
+    const curr = state.tournaments;
+
+    // Upsert tournaments whose updatedAt changed (or are brand-new)
+    const changed = curr.filter(t => {
+      const old = prev.find(p => p.id === t.id);
+      return !old || old.updatedAt !== t.updatedAt;
+    });
+
+    // Hard-delete rows for tournaments removed from state
+    const removed = prev.filter(p => !curr.find(c => c.id === p.id));
+
+    changed.forEach(t => upsertTournament(t));
+    removed.forEach(t => deleteTournament(t.id));
+
+    prevTournamentsRef.current = curr;
+  }, [state.tournaments, dbReady]);
 
   const setTheme = useCallback(theme => dispatch({ type: 'SET_THEME', payload: theme }), []);
 
   return (
-    <TournamentContext.Provider value={{ state, dispatch, setTheme }}>
+    <TournamentContext.Provider value={{ state, dispatch, setTheme, dbReady }}>
       {children}
     </TournamentContext.Provider>
   );
@@ -381,9 +425,19 @@ export function useTournamentContext() {
   return ctx;
 }
 
-/** Hook to get a specific tournament by ID */
+/** Hook to get a specific tournament by ID, with real-time updates from Supabase */
 export function useTournament(id) {
   const { state, dispatch } = useTournamentContext();
   const tournament = state.tournaments.find(t => t.id === id) || null;
+
+  // Real-time: when another session updates this tournament, hydrate it here
+  useEffect(() => {
+    if (!id || !isSupabaseEnabled) return;
+    const unsub = subscribeTournament(id, updated => {
+      dispatch({ type: 'HYDRATE', payload: state.tournaments.map(t => t.id === id ? updated : t) });
+    });
+    return unsub;
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return { tournament, dispatch };
 }
