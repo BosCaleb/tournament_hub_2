@@ -178,6 +178,168 @@ export function reducer(state, action) {
         playoffs: t.playoffs.map(m => m.id === action.payload.match.id ? { ...m, ...action.payload.match } : m),
       }));
 
+    // ─── Locked rounds ─────────────────────────────────────────
+    case 'TOGGLE_LOCK_ROUND': {
+      const { tournamentId, round } = action.payload;
+      return patchTournament(state, tournamentId, t => {
+        const locked = t.lockedRounds || [];
+        const isLocked = locked.includes(round);
+        return {
+          ...t,
+          lockedRounds: isLocked ? locked.filter(r => r !== round) : [...locked, round],
+        };
+      });
+    }
+
+    // ─── Custom round names ────────────────────────────────────
+    case 'SET_ROUND_NAME': {
+      const { tournamentId, round, name } = action.payload;
+      return patchTournament(state, tournamentId, t => ({
+        ...t,
+        roundNames: { ...(t.roundNames || {}), [round]: name },
+      }));
+    }
+
+    case 'DELETE_ROUND_NAME': {
+      const { tournamentId, round } = action.payload;
+      return patchTournament(state, tournamentId, t => {
+        const names = { ...(t.roundNames || {}) };
+        delete names[round];
+        return { ...t, roundNames: names };
+      });
+    }
+
+    // ─── Multiple playoff flows ────────────────────────────────
+    case 'ADD_PLAYOFF_FLOW': {
+      const flow = { id: generateId(), name: 'Playoff Flow', matches: [], ...action.payload.flow };
+      return patchTournament(state, action.payload.tournamentId, t => ({
+        ...t, playoffFlows: [...(t.playoffFlows || []), flow],
+      }));
+    }
+
+    case 'UPDATE_PLAYOFF_FLOW':
+      return patchTournament(state, action.payload.tournamentId, t => ({
+        ...t,
+        playoffFlows: (t.playoffFlows || []).map(f =>
+          f.id === action.payload.flow.id ? { ...f, ...action.payload.flow } : f
+        ),
+      }));
+
+    case 'DELETE_PLAYOFF_FLOW':
+      return patchTournament(state, action.payload.tournamentId, t => ({
+        ...t,
+        playoffFlows: (t.playoffFlows || []).filter(f => f.id !== action.payload.flowId),
+      }));
+
+    case 'UPDATE_PLAYOFF_FLOW_MATCH':
+      return patchTournament(state, action.payload.tournamentId, t => ({
+        ...t,
+        playoffFlows: (t.playoffFlows || []).map(f =>
+          f.id !== action.payload.flowId ? f : {
+            ...f,
+            matches: f.matches.map(m =>
+              m.id === action.payload.match.id ? { ...m, ...action.payload.match } : m
+            ),
+          }
+        ),
+      }));
+
+    // ─── Custom ranking lists ──────────────────────────────────
+    case 'ADD_RANKING_LIST': {
+      const list = { id: generateId(), name: 'Custom Ranking', teamIds: [], ...action.payload.list };
+      return patchTournament(state, action.payload.tournamentId, t => ({
+        ...t, rankingLists: [...(t.rankingLists || []), list],
+      }));
+    }
+
+    case 'UPDATE_RANKING_LIST':
+      return patchTournament(state, action.payload.tournamentId, t => ({
+        ...t,
+        rankingLists: (t.rankingLists || []).map(l =>
+          l.id === action.payload.list.id ? { ...l, ...action.payload.list } : l
+        ),
+      }));
+
+    case 'DELETE_RANKING_LIST':
+      return patchTournament(state, action.payload.tournamentId, t => ({
+        ...t,
+        rankingLists: (t.rankingLists || []).filter(l => l.id !== action.payload.listId),
+      }));
+
+    // ─── Soft delete / recycle bin ─────────────────────────────
+    case 'SOFT_DELETE_TEAM': {
+      const { tournamentId, teamId } = action.payload;
+      return patchTournament(state, tournamentId, t => {
+        const team = t.teams.find(tm => tm.id === teamId);
+        if (!team) return t;
+        const bin = t.deletedItems || { teams: [], fixtures: [], players: [] };
+        return {
+          ...t,
+          teams: t.teams.filter(tm => tm.id !== teamId),
+          pools: t.pools.map(p => ({ ...p, teamIds: p.teamIds.filter(id => id !== teamId) })),
+          fixtures: t.fixtures.filter(f => f.homeTeamId !== teamId && f.awayTeamId !== teamId),
+          players: t.players.map(p => p.teamId === teamId ? { ...p, teamId: null } : p),
+          deletedItems: { ...bin, teams: [...bin.teams, { ...team, deletedAt: new Date().toISOString() }] },
+        };
+      });
+    }
+
+    case 'SOFT_DELETE_FIXTURE': {
+      const { tournamentId, fixtureId } = action.payload;
+      return patchTournament(state, tournamentId, t => {
+        const fixture = t.fixtures.find(f => f.id === fixtureId);
+        if (!fixture) return t;
+        const bin = t.deletedItems || { teams: [], fixtures: [], players: [] };
+        return {
+          ...t,
+          fixtures: t.fixtures.filter(f => f.id !== fixtureId),
+          deletedItems: { ...bin, fixtures: [...bin.fixtures, { ...fixture, deletedAt: new Date().toISOString() }] },
+        };
+      });
+    }
+
+    case 'SOFT_DELETE_PLAYER': {
+      const { tournamentId, playerId } = action.payload;
+      return patchTournament(state, tournamentId, t => {
+        const player = t.players.find(p => p.id === playerId);
+        if (!player) return t;
+        const bin = t.deletedItems || { teams: [], fixtures: [], players: [] };
+        return {
+          ...t,
+          players: t.players.filter(p => p.id !== playerId),
+          deletedItems: { ...bin, players: [...bin.players, { ...player, deletedAt: new Date().toISOString() }] },
+        };
+      });
+    }
+
+    case 'RESTORE_DELETED_ITEM': {
+      const { tournamentId, itemType, itemId } = action.payload;
+      return patchTournament(state, tournamentId, t => {
+        const bin = t.deletedItems || { teams: [], fixtures: [], players: [] };
+        const item = bin[itemType]?.find(i => i.id === itemId);
+        if (!item) return t;
+        const { deletedAt, ...restored } = item;
+        const newBin = { ...bin, [itemType]: bin[itemType].filter(i => i.id !== itemId) };
+        if (itemType === 'teams') return { ...t, teams: [...t.teams, restored], deletedItems: newBin };
+        if (itemType === 'fixtures') return { ...t, fixtures: [...t.fixtures, restored], deletedItems: newBin };
+        if (itemType === 'players') return { ...t, players: [...t.players, restored], deletedItems: newBin };
+        return t;
+      });
+    }
+
+    case 'PERMANENTLY_DELETE_ITEM': {
+      const { tournamentId, itemType, itemId } = action.payload;
+      return patchTournament(state, tournamentId, t => {
+        const bin = t.deletedItems || { teams: [], fixtures: [], players: [] };
+        return { ...t, deletedItems: { ...bin, [itemType]: bin[itemType].filter(i => i.id !== itemId) } };
+      });
+    }
+
+    case 'EMPTY_RECYCLE_BIN':
+      return patchTournament(state, action.payload.tournamentId, t => ({
+        ...t, deletedItems: { teams: [], fixtures: [], players: [] },
+      }));
+
     default:
       return state;
   }

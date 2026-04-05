@@ -122,3 +122,21 @@
 .score-sep { font-family: var(--font-display); font-size: var(--text-3xl); font-weight: 700; color: var(--color-text-muted); flex-shrink: 0; }
 .score-error { color: var(--color-danger); font-size: var(--text-sm); margin-bottom: var(--space-3); text-align: center; }
 .score-modal-actions { display: flex; gap: var(--space-3); justify-content: flex-end; align-items: center; }
+
+/* Locked rounds */
+.fixture-round-locked .fixture-round-header { color: var(--color-warning, #d97706); }
+.fixture-round-locked .fixture-row { opacity: 0.75; pointer-events: none; }
+.fixture-round-locked .fixture-row:hover { box-shadow: none; }
+.round-label { display: flex; align-items: center; gap: var(--space-2); }
+.round-lock-icon { color: var(--color-warning, #d97706); flex-shrink: 0; }
+.round-header-right { display: flex; align-items: center; gap: var(--space-2); }
+.round-lock-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer; transition: all var(--transition-fast);
+}
+.round-lock-btn:hover { border-color: var(--color-warning, #d97706); color: var(--color-warning, #d97706); }
+.round-lock-btn-locked { border-color: var(--color-warning, #d97706); color: var(--color-warning, #d97706); background: color-mix(in srgb, var(--color-warning, #d97706) 10%, transparent); }

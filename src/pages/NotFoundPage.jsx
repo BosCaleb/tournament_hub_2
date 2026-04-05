@@ -16,7 +16,7 @@ export function NotFoundPage() {
           Page Not Found
         </h1>
         <p style={{ color: 'var(--color-text-muted)', maxWidth: 320 }}>
-          The tournament or page you're looking for doesn't exist.
+          The tournament or page you&apos;re looking for doesn&apos;t exist.
         </p>
         <Link to="/"><Button variant="accent">Back to Home</Button></Link>
       </div>

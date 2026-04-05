@@ -1,0 +1,87 @@
+.ranking-lists-tab { padding-block: var(--space-8); }
+.ranking-lists-tab .container { display: flex; flex-direction: column; gap: var(--space-5); }
+
+/* Header row */
+.rl-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--space-4); flex-wrap: wrap;
+}
+.rl-tabs { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.rl-tab {
+  display: flex; align-items: center; gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm); font-weight: 500;
+  cursor: pointer; transition: all var(--transition-fast);
+}
+.rl-tab:hover { border-color: var(--brand-orange); color: var(--color-text); }
+.rl-tab-active { background: var(--brand-navy); color: white; border-color: var(--brand-navy); }
+[data-theme="dark"] .rl-tab-active { background: var(--brand-orange); color: var(--brand-navy); border-color: var(--brand-orange); }
+.rl-tab-add { color: var(--brand-orange); border-color: var(--brand-orange); border-style: dashed; }
+.rl-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+
+/* Add team row */
+.rl-add-team { display: flex; gap: var(--space-3); align-items: center; }
+.rl-team-select { flex: 1; max-width: 320px; font-size: var(--text-sm); }
+
+/* Ranking rows */
+.rl-list { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.rl-row {
+  display: flex; align-items: center; gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.rl-row:hover { box-shadow: var(--shadow-sm); border-color: var(--color-border-strong); }
+.rl-row-dragging {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--brand-orange);
+  background: var(--color-surface-2);
+  opacity: 0.95;
+}
+
+.rl-rank {
+  width: 32px; height: 32px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--brand-navy); color: white;
+  border-radius: var(--radius-md);
+  font-weight: 700; font-size: var(--text-sm);
+  font-family: var(--font-display);
+}
+
+.rl-drag-handle {
+  color: var(--color-text-subtle);
+  cursor: grab;
+  flex-shrink: 0;
+  display: flex; align-items: center;
+}
+.rl-drag-handle:active { cursor: grabbing; }
+
+.rl-team-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.rl-team-name { font-weight: 600; font-size: var(--text-sm); color: var(--color-text); }
+.rl-team-school { font-size: var(--text-xs); color: var(--color-text-muted); }
+.rl-team-province { font-size: var(--text-xs); color: var(--color-text-subtle); flex-shrink: 0; }
+
+.rl-remove-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: var(--radius-sm);
+  border: 1px solid transparent; background: transparent;
+  color: var(--color-text-subtle); cursor: pointer;
+  transition: all var(--transition-fast); flex-shrink: 0;
+}
+.rl-remove-btn:hover { border-color: var(--color-danger); color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 8%, transparent); }
+
+.team-color-swatch-sm {
+  width: 10px; height: 24px; border-radius: 3px; flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .rl-header { flex-direction: column; }
+  .rl-actions { width: 100%; }
+}

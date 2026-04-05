@@ -6,7 +6,8 @@ import { FormField, Input, Select } from '../ui/FormField.jsx';
 import { EmptyState } from '../ui/EmptyState.jsx';
 import { Badge } from '../ui/Badge.jsx';
 import { NETBALL_POSITIONS, POSITION_COLORS } from '../../lib/types.js';
-import { downloadCSV, parseCSV } from '../../lib/utils.js';
+import { parseCSV } from '../../lib/utils.js';
+import { exportPlayersPDF, exportPlayersCSV } from '../../lib/export.js';
 import './PlayersTab.css';
 
 export function PlayersTab({ tournament, dispatch, toast, isAdmin = false }) {
@@ -42,13 +43,14 @@ export function PlayersTab({ tournament, dispatch, toast, isAdmin = false }) {
     setShowAdd(false); setEditPlayer(null);
   }
 
-  function handleExport() {
-    const rows = tournament.players.map(p => {
-      const team = tournament.teams.find(t => t.id === p.teamId);
-      return { name: p.name, jerseyNumber: p.jerseyNumber, position: p.position, team: team?.name || '', school: team?.schoolName || '' };
-    });
-    downloadCSV(rows, ['name','jerseyNumber','position','team','school'], `${tournament.name}-players.csv`);
-    toast.success('Players exported.');
+  function handleExportPDF() {
+    exportPlayersPDF(tournament);
+    toast.success('Players exported as PDF.');
+  }
+
+  function handleExportCSV() {
+    exportPlayersCSV(tournament);
+    toast.success('Players exported as CSV.');
   }
 
   function handleImport(e) {
@@ -95,9 +97,8 @@ export function PlayersTab({ tournament, dispatch, toast, isAdmin = false }) {
                 Add Player
               </Button>
             )}
-            <Button variant="secondary" size="sm" icon={<Download size={14} />} onClick={handleExport}>
-              Export
-            </Button>
+            <Button variant="ghost" size="sm" icon={<Download size={14} />} onClick={handleExportPDF}>PDF</Button>
+            <Button variant="ghost" size="sm" icon={<Download size={14} />} onClick={handleExportCSV}>CSV</Button>
             {isAdmin && (
               <label className="btn btn-secondary btn-sm" style={{ cursor: 'pointer' }}>
                 <Upload size={14} />
@@ -165,12 +166,12 @@ export function PlayersTab({ tournament, dispatch, toast, isAdmin = false }) {
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
         onConfirm={() => {
-          dispatch({ type: 'DELETE_PLAYER', payload: { tournamentId: tournament.id, playerId: deleteId } });
-          toast.success('Player removed.');
+          dispatch({ type: 'SOFT_DELETE_PLAYER', payload: { tournamentId: tournament.id, playerId: deleteId } });
+          toast.success('Player moved to recycle bin.');
           setDeleteId(null);
         }}
         title="Remove Player"
-        message="Are you sure you want to remove this player?"
+        message="This player will be moved to the recycle bin. You can restore them from the Admin tab."
         confirmLabel="Remove"
         danger
       />

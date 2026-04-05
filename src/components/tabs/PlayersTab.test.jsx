@@ -42,7 +42,9 @@ describe('PlayersTab — viewer (isAdmin=false)', () => {
 
   it('DOES show Export button (viewers can export)', () => {
     renderPlayersTab(false);
-    expect(screen.getByText(/Export/i)).toBeInTheDocument();
+    // Export is now split into PDF and CSV buttons
+    expect(screen.getByText('PDF')).toBeInTheDocument();
+    expect(screen.getByText('CSV')).toBeInTheDocument();
   });
 
   it('does NOT show edit button on player cards', () => {

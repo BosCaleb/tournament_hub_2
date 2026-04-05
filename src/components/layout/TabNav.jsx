@@ -14,7 +14,7 @@ export function TabNav({ tabs, active, onChange }) {
           >
             {tab.icon && <span className="tab-nav-icon">{tab.icon}</span>}
             <span>{tab.label}</span>
-            {tab.badge != null && (
+            {tab.badge !== null && tab.badge !== undefined && (
               <span className={`tab-nav-badge ${active === tab.id ? 'tab-nav-badge-active' : ''}`}>
                 {tab.badge}
               </span>

@@ -35,9 +35,15 @@ function defaultState() {
 
 function migrateState(old) {
   const base = { ...defaultState(), ...old, schemaVersion: SCHEMA_VERSION };
-  // Backfill sport field on tournaments created before multi-sport support
-  base.tournaments = (base.tournaments || []).map(t =>
-    t.sport ? t : { ...t, sport: 'netball' }
-  );
+  // Backfill missing fields on older tournaments
+  base.tournaments = (base.tournaments || []).map(t => ({
+    sport: 'netball',
+    lockedRounds: [],
+    roundNames: {},
+    playoffFlows: [],
+    rankingLists: [],
+    deletedItems: { teams: [], fixtures: [], players: [] },
+    ...t,
+  }));
   return base;
 }

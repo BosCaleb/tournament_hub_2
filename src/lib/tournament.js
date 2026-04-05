@@ -23,6 +23,12 @@ export function createTournament(overrides = {}) {
     tiebreakMethod: 'goal-difference',
     sport: 'netball',
     adminPinHash: null,
+    // ─── New feature fields ───────────────────────────────────────
+    lockedRounds: [],          // array of round numbers that are locked
+    roundNames: {},            // { [roundNumber]: string } custom round labels
+    playoffFlows: [],          // array of { id, name, matches[] } playoff flows
+    rankingLists: [],          // array of { id, name, teamIds[] } custom ranked lists
+    deletedItems: { teams: [], fixtures: [], players: [] }, // soft-delete recycle bin
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...overrides,

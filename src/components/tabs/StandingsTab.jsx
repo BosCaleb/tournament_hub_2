@@ -3,7 +3,7 @@ import { calculateStandings } from '../../lib/tournament.js';
 import { FormBadge } from '../ui/Badge.jsx';
 import { Button } from '../ui/Button.jsx';
 import { EmptyState } from '../ui/EmptyState.jsx';
-import { downloadCSV } from '../../lib/utils.js';
+import { exportStandingsPDF, exportStandingsCSV } from '../../lib/export.js';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell
@@ -21,27 +21,19 @@ export function StandingsTab({ tournament }) {
     );
   }
 
-  function exportPoolCSV(pool, standings) {
-    downloadCSV(standings, ['teamName','played','won','drawn','lost','goalsFor','goalsAgainst','goalDifference','points'],
-      `${tournament.name}-${pool.name}-standings.csv`);
-  }
-
   return (
     <div className="standings-tab">
       <div className="container">
+        <div className="standings-export-bar">
+          <Button variant="ghost" size="sm" icon={<Download size={14} />} onClick={() => exportStandingsPDF(tournament)}>PDF</Button>
+          <Button variant="ghost" size="sm" icon={<Download size={14} />} onClick={() => exportStandingsCSV(tournament)}>CSV</Button>
+        </div>
         {pools.map(pool => {
           const standings = calculateStandings(tournament, pool.id);
           return (
             <div key={pool.id} className="standings-pool-section">
               <div className="standings-pool-header">
                 <h2 className="standings-pool-title">{pool.name}</h2>
-                <Button
-                  variant="ghost" size="sm"
-                  icon={<Download size={14} />}
-                  onClick={() => exportPoolCSV(pool, standings)}
-                >
-                  Export CSV
-                </Button>
               </div>
               <StandingsTable standings={standings} />
               {standings.length > 0 && <GoalsChart standings={standings} />}

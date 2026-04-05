@@ -4,7 +4,12 @@
       "Bash(npm install:*)",
       "Bash(npm run:*)",
       "Read(//c/Users/bosma/.claude/projects/c--Users-bosma-Documents-repository-statedge-tourn-tournament-hub-2/**)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(curl -s https://api.github.com/repos/BosCaleb/fixture-hub/contents/src)",
+      "Bash(curl -s https://raw.githubusercontent.com/BosCaleb/fixture-hub/main/src/App.tsx)",
+      "Bash(curl -s https://raw.githubusercontent.com/BosCaleb/fixture-hub/main/README.md)",
+      "Bash(curl -s https://api.github.com/repos/BosCaleb/fixture-hub/contents/src/pages)"
     ],
     "additionalDirectories": [
       "c:\\Users\\bosma\\.claude\\projects\\c--Users-bosma-Documents-repository-statedge-tourn-tournament-hub-2\\memory"

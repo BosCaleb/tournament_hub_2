@@ -125,3 +125,5 @@
   .standings-table th:nth-child(n+7):not(.col-pts):not(:last-child) { display: none; }
   .standings-table td:nth-child(n+7):not(:nth-last-child(2)):not(:last-child) { display: none; }
 }
+
+.standings-export-bar { display: flex; gap: var(--space-2); justify-content: flex-end; margin-bottom: var(--space-2); }

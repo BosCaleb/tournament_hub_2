@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, CheckCircle, RotateCcw, ChevronDown, ChevronUp, Zap } from 'lucide-react';
+import { Plus, Edit2, Trash2, CheckCircle, RotateCcw, Zap, Lock, Unlock, Download } from 'lucide-react';
 import { generateRoundRobin } from '../../lib/tournament.js';
 import { formatDate, formatTime } from '../../lib/utils.js';
+import { exportFixturesPDF, exportFixturesCSV } from '../../lib/export.js';
 import { Button } from '../ui/Button.jsx';
 import { Modal, ConfirmDialog } from '../ui/Modal.jsx';
 import { FormField, Input, Select } from '../ui/FormField.jsx';
@@ -16,6 +17,9 @@ export function FixturesTab({ tournament, dispatch, toast, isAdmin = false }) {
   const [scoreFixture, setScoreFixture] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  const lockedRounds = tournament.lockedRounds || [];
+  const roundNames = tournament.roundNames || {};
 
   const pools = tournament.pools;
   const currentPool = pools.find(p => p.id === activePool);
@@ -41,6 +45,22 @@ export function FixturesTab({ tournament, dispatch, toast, isAdmin = false }) {
     dispatch({ type: 'CLEAR_POOL_FIXTURES', payload: { tournamentId: tournament.id, poolId: activePool } });
     toast.success('Unplayed fixtures cleared.');
     setShowClearConfirm(false);
+  }
+
+  function handleToggleLock(round) {
+    dispatch({ type: 'TOGGLE_LOCK_ROUND', payload: { tournamentId: tournament.id, round } });
+    const isLocked = lockedRounds.includes(round);
+    toast.success(isLocked ? `Round ${round} unlocked.` : `Round ${round} locked.`);
+  }
+
+  function handleExportPDF() {
+    exportFixturesPDF(tournament, currentPool);
+    toast.success('Fixtures exported as PDF.');
+  }
+
+  function handleExportCSV() {
+    exportFixturesCSV(tournament, currentPool);
+    toast.success('Fixtures exported as CSV.');
   }
 
   if (pools.length === 0) {
@@ -88,9 +108,20 @@ export function FixturesTab({ tournament, dispatch, toast, isAdmin = false }) {
               </Button>
             </div>
             <div className="fixtures-actions-right">
+              <Button variant="ghost" size="sm" icon={<Download size={14} />} onClick={handleExportPDF}>PDF</Button>
+              <Button variant="ghost" size="sm" icon={<Download size={14} />} onClick={handleExportCSV}>CSV</Button>
               <Button variant="ghost" size="sm" icon={<RotateCcw size={14} />} onClick={() => setShowClearConfirm(true)}>
                 Clear Unplayed
               </Button>
+            </div>
+          </div>
+        )}
+        {!isAdmin && fixtures.length > 0 && (
+          <div className="fixtures-actions">
+            <div className="fixtures-actions-left" />
+            <div className="fixtures-actions-right">
+              <Button variant="ghost" size="sm" icon={<Download size={14} />} onClick={handleExportPDF}>PDF</Button>
+              <Button variant="ghost" size="sm" icon={<Download size={14} />} onClick={handleExportCSV}>CSV</Button>
             </div>
           </div>
         )}
@@ -110,27 +141,46 @@ export function FixturesTab({ tournament, dispatch, toast, isAdmin = false }) {
           />
         ) : (
           <div className="fixture-list">
-            {groupByRound(fixtures).map(({ round, fixtures: roundFixtures }) => (
-              <div key={round} className="fixture-round">
+            {groupByRound(fixtures).map(({ round, fixtures: roundFixtures }) => {
+              const isLocked = lockedRounds.includes(round);
+              const roundLabel = roundNames[round] || `Round ${round}`;
+              return (
+              <div key={round} className={`fixture-round ${isLocked ? 'fixture-round-locked' : ''}`}>
                 <div className="fixture-round-header">
-                  <span>Round {round}</span>
-                  <span className="round-badge">
-                    {roundFixtures.filter(f => f.played).length}/{roundFixtures.length} played
+                  <span className="round-label">
+                    {isLocked && <Lock size={12} className="round-lock-icon" />}
+                    {roundLabel}
+                    {isLocked && <Badge variant="warning" size="sm">Locked</Badge>}
                   </span>
+                  <div className="round-header-right">
+                    <span className="round-badge">
+                      {roundFixtures.filter(f => f.played).length}/{roundFixtures.length} played
+                    </span>
+                    {isAdmin && (
+                      <button
+                        className={`round-lock-btn ${isLocked ? 'round-lock-btn-locked' : ''}`}
+                        onClick={() => handleToggleLock(round)}
+                        title={isLocked ? 'Unlock round' : 'Lock round'}
+                      >
+                        {isLocked ? <Unlock size={13} /> : <Lock size={13} />}
+                      </button>
+                    )}
+                  </div>
                 </div>
                 {roundFixtures.map(f => (
                   <FixtureRow
                     key={f.id}
                     fixture={f}
                     tournament={tournament}
-                    isAdmin={isAdmin}
+                    isAdmin={isAdmin && !isLocked}
                     onEdit={() => setEditFixture(f)}
                     onDelete={() => setDeleteId(f.id)}
                     onScore={() => setScoreFixture(f)}
                   />
                 ))}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -183,12 +233,12 @@ export function FixturesTab({ tournament, dispatch, toast, isAdmin = false }) {
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
         onConfirm={() => {
-          dispatch({ type: 'DELETE_FIXTURE', payload: { tournamentId: tournament.id, fixtureId: deleteId } });
-          toast.success('Fixture deleted.');
+          dispatch({ type: 'SOFT_DELETE_FIXTURE', payload: { tournamentId: tournament.id, fixtureId: deleteId } });
+          toast.success('Fixture moved to recycle bin.');
           setDeleteId(null);
         }}
         title="Delete Fixture"
-        message="Are you sure you want to delete this fixture?"
+        message="This fixture will be moved to the recycle bin. You can restore it from the Admin tab."
         confirmLabel="Delete"
         danger
       />

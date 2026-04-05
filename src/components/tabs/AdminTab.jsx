@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import {
   Settings, Users, Database, Shield, Plus, Trash2, Edit2,
-  Download, Upload, Printer, RefreshCw, Lock, Unlock
+  Download, Upload, Printer, RefreshCw, Lock, Unlock,
+  RotateCcw, Tag, Recycle
 } from 'lucide-react';
 import { useAdminAuth } from '../../hooks/useAdminAuth.js';
 import { Button } from '../ui/Button.jsx';
@@ -28,8 +29,10 @@ export function AdminTab({ tournament, dispatch, toast }) {
             <TournamentSettings tournament={tournament} dispatch={dispatch} toast={toast} />
             <TeamManager tournament={tournament} dispatch={dispatch} toast={toast} />
             <PoolManager tournament={tournament} dispatch={dispatch} toast={toast} />
+            <RoundNamesManager tournament={tournament} dispatch={dispatch} toast={toast} />
             <SecuritySettings tournament={tournament} dispatch={dispatch} toast={toast} auth={auth} />
             <DataTools tournament={tournament} dispatch={dispatch} toast={toast} />
+            <RecycleBin tournament={tournament} dispatch={dispatch} toast={toast} />
           </div>
         </div>
       </div>
@@ -72,8 +75,10 @@ function AdminSidebar() {
           { label: 'Tournament Settings', icon: <Settings size={15} />, href: '#settings' },
           { label: 'Teams', icon: <Users size={15} />, href: '#teams' },
           { label: 'Pools', icon: <Users size={15} />, href: '#pools' },
+          { label: 'Round Names', icon: <Tag size={15} />, href: '#round-names' },
           { label: 'Security', icon: <Shield size={15} />, href: '#security' },
           { label: 'Data & Backup', icon: <Database size={15} />, href: '#data' },
+          { label: 'Recycle Bin', icon: <Recycle size={15} />, href: '#recycle' },
         ].map(item => (
           <a key={item.href} href={item.href} className="admin-nav-item">
             {item.icon}
@@ -304,8 +309,8 @@ function TeamManager({ tournament, dispatch, toast }) {
       </Modal>
 
       <ConfirmDialog open={!!deleteId} onClose={() => setDeleteId(null)}
-        onConfirm={() => { dispatch({ type: 'DELETE_TEAM', payload: { tournamentId: tournament.id, teamId: deleteId } }); toast.success('Team removed.'); setDeleteId(null); }}
-        title="Remove Team" message="This will remove the team and all their fixtures. This cannot be undone."
+        onConfirm={() => { dispatch({ type: 'SOFT_DELETE_TEAM', payload: { tournamentId: tournament.id, teamId: deleteId } }); toast.success('Team moved to recycle bin.'); setDeleteId(null); }}
+        title="Remove Team" message="This will move the team to the recycle bin. You can restore it from the Recycle Bin section."
         confirmLabel="Remove" danger />
     </section>
   );
@@ -585,5 +590,169 @@ function DataToolCard({ icon, title, description, action, danger = false }) {
       </div>
       <div className="data-tool-action">{action}</div>
     </div>
+  );
+}
+
+// ─── Round Names Manager ───────────────────────────────────────────────────────
+
+function RoundNamesManager({ tournament, dispatch, toast }) {
+  const [round, setRound] = useState('');
+  const [name, setName] = useState('');
+
+  const roundNames = tournament.roundNames || {};
+  const allRounds = [...new Set(tournament.fixtures.map(f => f.round))].sort((a, b) => a - b);
+
+  function handleSave(e) {
+    e.preventDefault();
+    const r = parseInt(round);
+    if (!r || r < 1) { toast.error('Enter a valid round number.'); return; }
+    if (!name.trim()) {
+      dispatch({ type: 'DELETE_ROUND_NAME', payload: { tournamentId: tournament.id, round: r } });
+      toast.success(`Custom name for Round ${r} removed.`);
+    } else {
+      dispatch({ type: 'SET_ROUND_NAME', payload: { tournamentId: tournament.id, round: r, name: name.trim() } });
+      toast.success(`Round ${r} named "${name.trim()}".`);
+    }
+    setRound(''); setName('');
+  }
+
+  return (
+    <section id="round-names" className="admin-section">
+      <div className="admin-section-header">
+        <Tag size={18} />
+        <h2>Custom Round Names</h2>
+      </div>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)' }}>
+        Assign custom labels to fixture rounds (e.g. Round 1 &rarr; &ldquo;Grand Final&rdquo;). Leave name blank to remove a custom label.
+      </p>
+
+      {/* Existing names */}
+      {Object.entries(roundNames).length > 0 && (
+        <div className="round-names-list">
+          {Object.entries(roundNames).sort(([a], [b]) => Number(a) - Number(b)).map(([r, n]) => (
+            <div key={r} className="round-name-row">
+              <span className="round-name-number">Round {r}</span>
+              <span className="round-name-arrow">→</span>
+              <span className="round-name-label">{n}</span>
+              <button className="admin-action-btn admin-delete-btn" onClick={() => {
+                dispatch({ type: 'DELETE_ROUND_NAME', payload: { tournamentId: tournament.id, round: Number(r) } });
+                toast.success(`Custom name for Round ${r} removed.`);
+              }}><Trash2 size={13} /></button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <form onSubmit={handleSave} className="round-name-form">
+        <div className="form-row">
+          <div style={{ flex: '0 0 120px' }}>
+            {allRounds.length > 0 ? (
+              <select className="input" value={round} onChange={e => setRound(e.target.value)}>
+                <option value="">Round #</option>
+                {allRounds.map(r => <option key={r} value={r}>Round {r}</option>)}
+              </select>
+            ) : (
+              <input type="number" min="1" className="input" placeholder="Round #" value={round} onChange={e => setRound(e.target.value)} />
+            )}
+          </div>
+          <input className="input" style={{ flex: 1 }} placeholder="Custom name (e.g. Grand Final)" value={name} onChange={e => setName(e.target.value)} />
+          <Button type="submit" variant="accent" size="sm">Set</Button>
+        </div>
+      </form>
+    </section>
+  );
+}
+
+// ─── Recycle Bin ─────────────────────────────────────────────────────────────
+
+function RecycleBin({ tournament, dispatch, toast }) {
+  const bin = tournament.deletedItems || { teams: [], fixtures: [], players: [] };
+  const total = (bin.teams?.length || 0) + (bin.fixtures?.length || 0) + (bin.players?.length || 0);
+
+  function restore(itemType, itemId) {
+    dispatch({ type: 'RESTORE_DELETED_ITEM', payload: { tournamentId: tournament.id, itemType, itemId } });
+    toast.success('Item restored.');
+  }
+
+  function permanentDelete(itemType, itemId) {
+    dispatch({ type: 'PERMANENTLY_DELETE_ITEM', payload: { tournamentId: tournament.id, itemType, itemId } });
+    toast.info('Permanently deleted.');
+  }
+
+  function emptyBin() {
+    dispatch({ type: 'EMPTY_RECYCLE_BIN', payload: { tournamentId: tournament.id } });
+    toast.success('Recycle bin emptied.');
+  }
+
+  return (
+    <section id="recycle" className="admin-section">
+      <div className="admin-section-header">
+        <Recycle size={18} />
+        <h2>Recycle Bin {total > 0 && <span style={{ marginLeft: 'var(--space-2)' }}><span className="badge badge-warning">{total}</span></span>}</h2>
+        {total > 0 && (
+          <div className="admin-section-actions">
+            <Button variant="danger" size="sm" icon={<Trash2 size={13} />} onClick={() => { if (window.confirm('Permanently delete all items in the recycle bin?')) emptyBin(); }}>Empty Bin</Button>
+          </div>
+        )}
+      </div>
+
+      {total === 0 ? (
+        <div className="admin-empty">The recycle bin is empty.</div>
+      ) : (
+        <div className="recycle-bin-list">
+          {/* Teams */}
+          {(bin.teams || []).map(team => (
+            <div key={team.id} className="recycle-row">
+              <Recycle size={14} className="recycle-type-icon" />
+              <div className="recycle-info">
+                <span className="recycle-name">{team.name}</span>
+                <span className="recycle-meta">Team · {team.schoolName || team.province || ''}</span>
+              </div>
+              <div className="recycle-actions">
+                <Button variant="secondary" size="sm" icon={<RotateCcw size={13} />} onClick={() => restore('teams', team.id)}>Restore</Button>
+                <Button variant="danger" size="sm" icon={<Trash2 size={13} />} onClick={() => permanentDelete('teams', team.id)}>Delete</Button>
+              </div>
+            </div>
+          ))}
+
+          {/* Fixtures */}
+          {(bin.fixtures || []).map(fixture => {
+            const home = tournament.teams.find(t => t.id === fixture.homeTeamId);
+            const away = tournament.teams.find(t => t.id === fixture.awayTeamId);
+            return (
+              <div key={fixture.id} className="recycle-row">
+                <Recycle size={14} className="recycle-type-icon" />
+                <div className="recycle-info">
+                  <span className="recycle-name">{home?.name || 'TBD'} vs {away?.name || 'TBD'}</span>
+                  <span className="recycle-meta">Fixture · Round {fixture.round}{fixture.date ? ` · ${fixture.date}` : ''}</span>
+                </div>
+                <div className="recycle-actions">
+                  <Button variant="secondary" size="sm" icon={<RotateCcw size={13} />} onClick={() => restore('fixtures', fixture.id)}>Restore</Button>
+                  <Button variant="danger" size="sm" icon={<Trash2 size={13} />} onClick={() => permanentDelete('fixtures', fixture.id)}>Delete</Button>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Players */}
+          {(bin.players || []).map(player => {
+            const team = tournament.teams.find(t => t.id === player.teamId);
+            return (
+              <div key={player.id} className="recycle-row">
+                <Recycle size={14} className="recycle-type-icon" />
+                <div className="recycle-info">
+                  <span className="recycle-name">{player.name}</span>
+                  <span className="recycle-meta">Player{team ? ` · ${team.name}` : ''}</span>
+                </div>
+                <div className="recycle-actions">
+                  <Button variant="secondary" size="sm" icon={<RotateCcw size={13} />} onClick={() => restore('players', player.id)}>Restore</Button>
+                  <Button variant="danger" size="sm" icon={<Trash2 size={13} />} onClick={() => permanentDelete('players', player.id)}>Delete</Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
   );
 }

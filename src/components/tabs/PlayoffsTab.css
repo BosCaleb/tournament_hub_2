@@ -140,3 +140,31 @@
 .score-sep { font-family: var(--font-display); font-size: var(--text-3xl); font-weight: 700; color: var(--color-text-muted); flex-shrink: 0; }
 .score-error { color: var(--color-danger); font-size: var(--text-sm); margin-bottom: var(--space-3); text-align: center; }
 .score-modal-actions { display: flex; gap: var(--space-3); justify-content: flex-end; align-items: center; }
+
+/* Multiple playoff flows */
+.flow-selector { margin-bottom: var(--space-4); }
+.flow-tabs { display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center; }
+.flow-tab {
+  display: flex; align-items: center; gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm); font-weight: 500;
+  cursor: pointer; transition: all var(--transition-fast);
+}
+.flow-tab:hover { border-color: var(--brand-orange); color: var(--color-text); }
+.flow-tab-active { background: var(--brand-navy); color: white; border-color: var(--brand-navy); }
+[data-theme="dark"] .flow-tab-active { background: var(--brand-orange); color: var(--brand-navy); border-color: var(--brand-orange); }
+.flow-tab-add { color: var(--brand-orange); border-color: var(--brand-orange); border-style: dashed; }
+.flow-tab-wrap { position: relative; display: flex; align-items: center; gap: 2px; }
+.flow-tab-actions { display: flex; gap: 2px; }
+.flow-tab-action-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border); background: var(--color-surface);
+  color: var(--color-text-muted); cursor: pointer;
+}
+.flow-tab-action-btn:hover { border-color: var(--color-border-strong); color: var(--color-text); }
+.flow-tab-delete-btn:hover { border-color: var(--color-danger); color: var(--color-danger); }

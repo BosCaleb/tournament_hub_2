@@ -85,7 +85,7 @@ export function LandingPage() {
           </h1>
 
           <p className="landing-hero-sub">
-            South Africa's tournament management platform for high school sport.
+            South Africa&apos;s tournament management platform for high school sport.
             Fixtures, standings, playoffs and player stats — live, in one place.
           </p>
 
@@ -138,7 +138,7 @@ export function LandingPage() {
       {/* ── Features ─────────────────────────────────────────── */}
       <section className="landing-features">
         <div className="container">
-          <div className="section-label">What's included</div>
+          <div className="section-label">What&apos;s included</div>
           <h2 className="section-title">Everything you need to run a great tournament</h2>
           <div className="features-grid">
             {FEATURES.map(f => (

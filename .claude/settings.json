@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s https://raw.githubusercontent.com/BosCaleb/fixture-hub/main/src/components/RankingsManager.tsx)"
+    ]
+  }
+}
