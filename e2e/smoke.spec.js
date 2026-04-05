@@ -11,8 +11,7 @@ test.describe('Navigation', () => {
   test('landing page loads with StatEdge branding', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveTitle(/StatEdge/i);
-    await expect(page.locator('text=STATEDGE')).toBeVisible();
-    await expect(page.locator('text=Sports Analytics')).toBeVisible();
+    await expect(page.getByRole('link', { name: /statedge sports analytics/i })).toBeVisible();
   });
 
   test('landing page has no console errors', async ({ page }) => {
@@ -32,8 +31,8 @@ test.describe('Navigation', () => {
 
   test('/sports loads sport selector page', async ({ page }) => {
     await page.goto('/sports');
-    await expect(page.locator('text=What are you managing today')).toBeVisible();
-    await expect(page.locator('text=Netball')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /what are you managing today/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /netball/i })).toBeVisible();
   });
 
   test('Netball sport card is active (clickable)', async ({ page }) => {
@@ -54,7 +53,7 @@ test.describe('Navigation', () => {
 
   test('/admin shows login page', async ({ page }) => {
     await page.goto('/admin');
-    await expect(page.locator('text=Admin Portal')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Admin Portal' })).toBeVisible();
   });
 
   test('unknown route shows 404 page', async ({ page }) => {
@@ -71,13 +70,13 @@ test.describe('SPA routing', () => {
     const response = await page.goto('/sports');
     // Server should return 200 via staticwebapp.config.json navigationFallback
     expect(response?.status()).not.toBe(404);
-    await expect(page.locator('text=STATEDGE')).toBeVisible();
+    await expect(page.getByRole('link', { name: /statedge sports analytics/i })).toBeVisible();
   });
 
   test('direct URL /admin returns app (not 404)', async ({ page }) => {
     const response = await page.goto('/admin');
     expect(response?.status()).not.toBe(404);
-    await expect(page.locator('text=Admin Portal')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Admin Portal' })).toBeVisible();
   });
 });
 
@@ -91,7 +90,7 @@ test.describe('Admin auth', () => {
 
     await page.goto('/admin/dashboard');
     await expect(page).toHaveURL('/admin');
-    await expect(page.locator('text=Admin Portal')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Admin Portal' })).toBeVisible();
   });
 
   test('admin login with no PIN set enters portal directly', async ({ page }) => {
@@ -186,13 +185,13 @@ test.describe('Admin — create and view tournament', () => {
     });
 
     await page.goto('/admin/netball/smoke-t1');
-    await expect(page.locator('text=Overview')).toBeVisible();
-    await expect(page.locator('text=Fixtures')).toBeVisible();
-    await expect(page.locator('text=Standings')).toBeVisible();
-    await expect(page.locator('text=Playoffs')).toBeVisible();
-    await expect(page.locator('text=Players')).toBeVisible();
-    await expect(page.locator('text=Statistics')).toBeVisible();
-    await expect(page.locator('text=Admin')).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Overview' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Fixtures' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Standings' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Playoffs' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Players' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Statistics' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Admin' })).toBeVisible();
   });
 });
 
@@ -233,13 +232,13 @@ test.describe('Viewer — read-only tournament view', () => {
 
   test('viewer sees 6 tabs (no Admin tab)', async ({ page }) => {
     await page.goto('/sports/netball/viewer-t1');
-    await expect(page.locator('text=Overview')).toBeVisible();
-    await expect(page.locator('text=Fixtures')).toBeVisible();
-    await expect(page.locator('text=Standings')).toBeVisible();
-    await expect(page.locator('text=Playoffs')).toBeVisible();
-    await expect(page.locator('text=Players')).toBeVisible();
-    await expect(page.locator('text=Statistics')).toBeVisible();
-    await expect(page.locator('[role="tab"]:has-text("Admin"), button:has-text("Admin")')).not.toBeVisible().catch(() => {});
+    await expect(page.getByRole('tab', { name: 'Overview' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Fixtures' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Standings' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Playoffs' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Players' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Statistics' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Admin' })).toHaveCount(0);
   });
 
   test('viewer header does NOT show Admin badge', async ({ page }) => {
@@ -287,6 +286,6 @@ test.describe('Mobile layout', () => {
   test('sport selector renders correctly on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/sports');
-    await expect(page.locator('text=Netball')).toBeVisible();
+    await expect(page.getByRole('link', { name: /netball/i })).toBeVisible();
   });
 });
