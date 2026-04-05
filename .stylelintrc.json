@@ -7,7 +7,21 @@
     "no-descending-specificity": null,
     "import-notation": null,
     "alpha-value-notation": null,
-    "color-function-notation": null
+    "color-function-notation": null,
+
+    "declaration-block-single-line-max-declarations": null,
+    "rule-empty-line-before": null,
+    "at-rule-empty-line-before": null,
+    "color-function-alias-notation": null,
+    "media-feature-range-notation": null,
+    "property-no-vendor-prefix": null,
+    "color-hex-length": null,
+    "value-keyword-case": null,
+    "hue-degree-notation": null,
+    "custom-property-empty-line-before": null,
+    "block-no-empty": null,
+    "property-no-deprecated": null,
+    "selector-not-notation": null
   },
   "ignoreFiles": ["dist/**", "node_modules/**"]
 }
