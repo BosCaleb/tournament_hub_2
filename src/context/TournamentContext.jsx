@@ -6,7 +6,7 @@ import { debounce } from '../lib/utils.js';
 
 const TournamentContext = createContext(null);
 
-function reducer(state, action) {
+export function reducer(state, action) {
   switch (action.type) {
     case 'SET_THEME':
       return { ...state, theme: action.payload };
