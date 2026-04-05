@@ -369,12 +369,17 @@ export function TournamentProvider({ children }) {
   useEffect(() => {
     if (!isSupabaseEnabled) return;
 
-    loadTournaments().then(tournaments => {
-      if (tournaments !== null) {
-        dispatch({ type: 'HYDRATE', payload: tournaments });
-      }
-      setDbReady(true);
-    });
+    loadTournaments()
+      .then(tournaments => {
+        if (tournaments !== null) {
+          dispatch({ type: 'HYDRATE', payload: tournaments });
+        }
+        setDbReady(true);
+      })
+      .catch(err => {
+        console.error('[db] Failed to load tournaments:', err);
+        setDbReady(true); // always unblock the UI even if Supabase is unreachable
+      });
   }, []);
 
   // ── Apply theme ────────────────────────────────────────────────────────────
