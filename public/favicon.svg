@@ -1,4 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#0A1628"/>
-  <text x="16" y="23" text-anchor="middle" font-family="Oswald,Arial Black,sans-serif" font-size="18" font-weight="700" fill="#FFC500">SE</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="outerBlue" cx="45%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#3A70D8"/>
+      <stop offset="100%" stop-color="#1A3272"/>
+    </radialGradient>
+    <radialGradient id="orangeBand" cx="45%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#F89030"/>
+      <stop offset="100%" stop-color="#D96010"/>
+    </radialGradient>
+    <radialGradient id="innerBlue" cx="40%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#3A70D8"/>
+      <stop offset="100%" stop-color="#162560"/>
+    </radialGradient>
+  </defs>
+  <!-- Outer blue disc -->
+  <circle cx="32" cy="32" r="31" fill="url(#outerBlue)"/>
+  <!-- White separator ring -->
+  <circle cx="32" cy="32" r="27" fill="white"/>
+  <!-- Orange band -->
+  <circle cx="32" cy="32" r="26" fill="url(#orangeBand)"/>
+  <!-- Dark brown ring -->
+  <circle cx="32" cy="32" r="21" fill="#2A1408"/>
+  <!-- White inner ring -->
+  <circle cx="32" cy="32" r="19.5" fill="white"/>
+  <!-- Inner blue circle -->
+  <circle cx="32" cy="32" r="18" fill="url(#innerBlue)"/>
+  <!-- StatEdge mark: triangle (top of A) in orange -->
+  <polygon points="32,15 23,36 41,36" fill="#F47820"/>
+  <!-- StatEdge mark: chevron/arrow in white -->
+  <polygon points="20,36 32,49 44,36 40,36 32,44 24,36" fill="white"/>
 </svg>

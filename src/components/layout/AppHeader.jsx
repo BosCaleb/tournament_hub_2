@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Sun, Moon, Trophy, ArrowLeft, Shield } from 'lucide-react';
+import { Sun, Moon, ArrowLeft, Shield } from 'lucide-react';
 import { useTournamentContext } from '../../context/TournamentContext.jsx';
+import { StatEdgeIcon } from '../ui/StatEdgeLogo.jsx';
 import './AppHeader.css';
 
 export function AppHeader({ title, subtitle, backPath, isAdmin }) {
@@ -11,6 +12,7 @@ export function AppHeader({ title, subtitle, backPath, isAdmin }) {
   return (
     <header className="app-header">
       <div className="container app-header-inner">
+
         <div className="app-header-left">
           {backPath && (
             <button
@@ -22,12 +24,10 @@ export function AppHeader({ title, subtitle, backPath, isAdmin }) {
             </button>
           )}
           <Link to="/" className="app-header-brand">
-            <div className="brand-logo">
-              <Trophy size={20} />
-            </div>
+            <StatEdgeIcon size={36} />
             <div className="brand-text">
-              <span className="brand-name">StatEdge</span>
-              <span className="brand-sub">Sports</span>
+              <span className="brand-name">STATEDGE</span>
+              <span className="brand-sub">Sports Analytics</span>
             </div>
           </Link>
         </div>
@@ -54,6 +54,7 @@ export function AppHeader({ title, subtitle, backPath, isAdmin }) {
             {isDark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         </div>
+
       </div>
     </header>
   );

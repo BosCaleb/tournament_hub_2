@@ -1,11 +1,15 @@
 :root {
   /* ─── Brand ─────────────────────────────────────────────── */
-  --brand-navy:        #0A1628;
-  --brand-navy-mid:    #112240;
-  --brand-navy-light:  #1B3461;
-  --brand-gold:        #FFC500;
-  --brand-gold-hover:  #E6B000;
-  --brand-gold-dim:    #FFC50020;
+  --brand-navy:        #0D1C3E;
+  --brand-navy-mid:    #162650;
+  --brand-navy-light:  #1E3570;
+  --brand-blue:        #2154A8;
+  --brand-gold:        #F47820;   /* StatEdge orange — legacy alias kept */
+  --brand-gold-hover:  #D96510;
+  --brand-gold-dim:    #F4782020;
+  --brand-orange:      #F47820;
+  --brand-orange-hover:#D96510;
+  --brand-orange-dim:  #F4782018;
 
   /* ─── Semantic – Light Mode ─────────────────────────────── */
   --color-bg:          #F0F4F8;
@@ -15,16 +19,16 @@
   --color-border:      #D1DBE8;
   --color-border-strong: #A8BECC;
 
-  --color-primary:     #112240;
-  --color-primary-hover: #1B3461;
-  --color-accent:      #FFC500;
-  --color-accent-hover:#E6B000;
+  --color-primary:     #162650;
+  --color-primary-hover: #1E3570;
+  --color-accent:      #F47820;
+  --color-accent-hover:#D96510;
 
-  --color-text:        #0A1628;
-  --color-text-muted:  #5A6F87;
-  --color-text-subtle: #8FA3B8;
+  --color-text:        #0D1C3E;
+  --color-text-muted:  #4A6080;
+  --color-text-subtle: #7A96B0;
   --color-text-on-primary: #FFFFFF;
-  --color-text-on-accent:  #0A1628;
+  --color-text-on-accent:  #FFFFFF;
 
   /* ─── Status colours ────────────────────────────────────── */
   --color-win:         #16A34A;
@@ -122,16 +126,16 @@
   --color-border:      #1E3456;
   --color-border-strong: #2A4A78;
 
-  --color-primary:     #FFC500;
-  --color-primary-hover: #FFD333;
-  --color-accent:      #FFC500;
-  --color-accent-hover:#FFD333;
+  --color-primary:     #F47820;
+  --color-primary-hover: #FF8C35;
+  --color-accent:      #F47820;
+  --color-accent-hover:#FF8C35;
 
   --color-text:        #EDF2F7;
   --color-text-muted:  #8FA3B8;
   --color-text-subtle: #5A7490;
-  --color-text-on-primary: #0A1628;
-  --color-text-on-accent:  #0A1628;
+  --color-text-on-primary: #FFFFFF;
+  --color-text-on-accent:  #FFFFFF;
 
   --color-win-bg:      #052E12;
   --color-draw-bg:     #311E07;

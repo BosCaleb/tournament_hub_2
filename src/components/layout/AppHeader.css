@@ -48,28 +48,20 @@
   display: flex; align-items: center; gap: var(--space-3);
   text-decoration: none; flex-shrink: 0;
 }
-.brand-logo {
-  width: 36px; height: 36px;
-  background: var(--brand-gold);
-  border-radius: var(--radius-md);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--brand-navy);
-  flex-shrink: 0;
-}
-.brand-text { display: flex; flex-direction: column; line-height: 1; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
 .brand-name {
   font-family: var(--font-display);
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
   font-weight: 700;
-  color: var(--brand-gold);
-  letter-spacing: 0.05em;
+  color: #FFFFFF;
+  letter-spacing: 0.06em;
 }
 .brand-sub {
   font-size: 10px;
-  color: rgba(255,255,255,0.5);
+  color: var(--brand-orange);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 600;
 }
 .app-header-title {
   flex: 1;

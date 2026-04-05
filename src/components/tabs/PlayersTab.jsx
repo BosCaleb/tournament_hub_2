@@ -118,12 +118,12 @@ export function PlayersTab({ tournament, dispatch, toast, isAdmin = false }) {
           <EmptyState
             icon={<Plus size={28} />}
             title="No players yet"
-            description="Add players manually or import a CSV file with columns: name, jerseyNumber, position, team."
-            action={
+            description={isAdmin ? 'Add players manually or import a CSV file with columns: name, jerseyNumber, position, team.' : 'No players have been registered for this tournament yet.'}
+            action={isAdmin ? (
               <Button variant="accent" size="sm" icon={<Plus size={14} />} onClick={() => setShowAdd(true)}>
                 Add First Player
               </Button>
-            }
+            ) : null}
           />
         ) : (
           <div className="players-groups">
@@ -141,6 +141,7 @@ export function PlayersTab({ tournament, dispatch, toast, isAdmin = false }) {
                       key={p.id}
                       player={p}
                       team={team}
+                      isAdmin={isAdmin}
                       onEdit={() => setEditPlayer(p)}
                       onDelete={() => setDeleteId(p.id)}
                     />
@@ -177,7 +178,7 @@ export function PlayersTab({ tournament, dispatch, toast, isAdmin = false }) {
   );
 }
 
-function PlayerCard({ player, team, onEdit, onDelete }) {
+function PlayerCard({ player, team, isAdmin, onEdit, onDelete }) {
   const posInfo = POSITION_COLORS[player.position] || { bg: '#f3f4f6', text: '#374151', label: player.position };
 
   return (
@@ -193,10 +194,12 @@ function PlayerCard({ player, team, onEdit, onDelete }) {
           </span>
         )}
       </div>
-      <div className="player-card-actions">
-        <button className="player-action-btn" onClick={onEdit} title="Edit"><Edit2 size={13} /></button>
-        <button className="player-action-btn player-delete-btn" onClick={onDelete} title="Remove"><Trash2 size={13} /></button>
-      </div>
+      {isAdmin && (
+        <div className="player-card-actions">
+          <button className="player-action-btn" onClick={onEdit} title="Edit"><Edit2 size={13} /></button>
+          <button className="player-action-btn player-delete-btn" onClick={onDelete} title="Remove"><Trash2 size={13} /></button>
+        </div>
+      )}
     </div>
   );
 }
