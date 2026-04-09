@@ -1,15 +1,17 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Settings, Users, Database, Shield, Plus, Trash2, Edit2,
   Download, Upload, Printer, RefreshCw, Lock, Unlock,
-  RotateCcw, Tag, Recycle
+  RotateCcw, Tag, Recycle, ClipboardList, Key, ExternalLink,
+  X, Copy
 } from 'lucide-react';
 import { useAdminAuth } from '../../hooks/useAdminAuth.js';
 import { Button } from '../ui/Button.jsx';
 import { FormField, Input, Select } from '../ui/FormField.jsx';
 import { Modal, ConfirmDialog } from '../ui/Modal.jsx';
 import { Badge } from '../ui/Badge.jsx';
-import { downloadJSON, hashPin, parseCSV } from '../../lib/utils.js';
+import { downloadJSON, hashPin, parseCSV, generateId } from '../../lib/utils.js';
 import { AGE_GROUPS, SA_PROVINCES } from '../../lib/types.js';
 import './AdminTab.css';
 
@@ -30,6 +32,7 @@ export function AdminTab({ tournament, dispatch, toast }) {
             <TeamManager tournament={tournament} dispatch={dispatch} toast={toast} />
             <PoolManager tournament={tournament} dispatch={dispatch} toast={toast} />
             <RoundNamesManager tournament={tournament} dispatch={dispatch} toast={toast} />
+            <ScorekeepersManager tournament={tournament} dispatch={dispatch} toast={toast} />
             <SecuritySettings tournament={tournament} dispatch={dispatch} toast={toast} auth={auth} />
             <DataTools tournament={tournament} dispatch={dispatch} toast={toast} />
             <RecycleBin tournament={tournament} dispatch={dispatch} toast={toast} />
@@ -76,6 +79,7 @@ function AdminSidebar() {
           { label: 'Teams', icon: <Users size={15} />, href: '#teams' },
           { label: 'Pools', icon: <Users size={15} />, href: '#pools' },
           { label: 'Round Names', icon: <Tag size={15} />, href: '#round-names' },
+          { label: 'Scorekeepers', icon: <ClipboardList size={15} />, href: '#scorekeepers' },
           { label: 'Security', icon: <Shield size={15} />, href: '#security' },
           { label: 'Data & Backup', icon: <Database size={15} />, href: '#data' },
           { label: 'Recycle Bin', icon: <Recycle size={15} />, href: '#recycle' },
@@ -86,6 +90,13 @@ function AdminSidebar() {
           </a>
         ))}
       </nav>
+      <div className="admin-nav-external">
+        <Link to="/admin/templates" className="admin-nav-item admin-nav-item--external">
+          <ClipboardList size={15} />
+          Scorecard Templates
+          <ExternalLink size={11} />
+        </Link>
+      </div>
     </aside>
   );
 }
@@ -752,6 +763,194 @@ function RecycleBin({ tournament, dispatch, toast }) {
             );
           })}
         </div>
+      )}
+    </section>
+  );
+}
+
+// ─── Scorekeepers Manager ─────────────────────────────────────────────────────
+
+function ScorekeepersManager({ tournament, dispatch, toast }) {
+  const [newName, setNewName]   = useState('');
+  const [fixtureId, setFixtureId] = useState('');
+  const [code, setCode]         = useState(tournament.scorekeeperCode || '');
+  const [codeSaved, setCodeSaved] = useState(false);
+
+  const assignments = tournament.scorekeeperAssignments || [];
+
+  function handleAddAssignment(e) {
+    e.preventDefault();
+    if (!newName.trim() || !fixtureId) return;
+
+    const fixture = tournament.fixtures.find(f => f.id === fixtureId);
+    if (!fixture) return;
+
+    dispatch({
+      type: 'ADD_SCOREKEEPER_ASSIGNMENT',
+      payload: {
+        tournamentId: tournament.id,
+        assignment: {
+          id: generateId(),
+          fixtureId,
+          scorekeeperName: newName.trim(),
+          active: true,
+          assignedAt: new Date().toISOString(),
+        },
+      },
+    });
+    toast.success(`${newName.trim()} assigned.`);
+    setNewName('');
+    setFixtureId('');
+  }
+
+  function handleRemove(assignmentId) {
+    dispatch({
+      type: 'REMOVE_SCOREKEEPER_ASSIGNMENT',
+      payload: { tournamentId: tournament.id, assignmentId },
+    });
+    toast.success('Assignment removed.');
+  }
+
+  function handleSaveCode(e) {
+    e.preventDefault();
+    dispatch({
+      type: 'SET_SCOREKEEPER_CODE',
+      payload: { tournamentId: tournament.id, code: code.trim().toUpperCase() },
+    });
+    setCodeSaved(true);
+    setTimeout(() => setCodeSaved(false), 2000);
+    toast.success('Scorekeeper code saved.');
+  }
+
+  function handleCopyCode() {
+    navigator.clipboard.writeText(tournament.scorekeeperCode || '');
+    toast.success('Code copied to clipboard.');
+  }
+
+  // Fixture options
+  const fixtureOptions = tournament.fixtures.map(f => {
+    const home = tournament.teams.find(t => t.id === f.homeTeamId);
+    const away = tournament.teams.find(t => t.id === f.awayTeamId);
+    return {
+      value: f.id,
+      label: `R${f.round}${f.court ? ` C${f.court}` : ''}: ${home?.name || 'TBD'} vs ${away?.name || 'TBD'}`,
+    };
+  });
+
+  return (
+    <section id="scorekeepers" className="admin-section">
+      <div className="admin-section-header">
+        <ClipboardList size={18} />
+        <h2>Scorekeepers</h2>
+        <Link to="/admin/templates" className="btn btn-secondary btn-sm" style={{ marginLeft: 'auto' }}>
+          <ExternalLink size={13} />
+          Scorecard Templates
+        </Link>
+      </div>
+
+      {/* Scorekeeper Code */}
+      <div className="admin-subsection">
+        <div className="admin-subsection-title" id="sk-code-label">
+          <Key size={14} /> Tournament Access Code
+        </div>
+        <p className="admin-subsection-desc">
+          Share this code with scorekeepers. They enter it at{' '}
+          <strong>/scorekeeper</strong> together with their name to log in.
+        </p>
+        <form onSubmit={handleSaveCode} className="sk-code-form">
+          <div className="sk-code-row">
+            <Input
+              value={code}
+              onChange={e => setCode(e.target.value.toUpperCase())}
+              placeholder="e.g. NET2026"
+              maxLength={20}
+              aria-labelledby="sk-code-label"
+              style={{ fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.1em', flex: 1 }}
+            />
+            {tournament.scorekeeperCode && (
+              <Button type="button" variant="ghost" size="sm" icon={<Copy size={13} />} onClick={handleCopyCode}>
+                Copy
+              </Button>
+            )}
+            <Button type="submit" variant="accent" size="sm">
+              {codeSaved ? 'Saved ✓' : 'Save Code'}
+            </Button>
+          </div>
+        </form>
+      </div>
+
+      {/* Assign scorekeepers */}
+      <div className="admin-subsection">
+        <div className="admin-subsection-title">Assign Scorekeepers to Fixtures</div>
+        <form onSubmit={handleAddAssignment} className="sk-assign-form">
+          <div className="form-row">
+            <FormField label="Scorekeeper Name">
+              <Input
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+                placeholder="e.g. Thandi Nkosi"
+                required
+              />
+            </FormField>
+            <FormField label="Fixture">
+              <Select value={fixtureId} onChange={e => setFixtureId(e.target.value)} required>
+                <option value="">Select fixture…</option>
+                {fixtureOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </Select>
+            </FormField>
+          </div>
+          <div className="form-actions">
+            <Button type="submit" variant="accent" size="sm" icon={<Plus size={14} />}
+              disabled={!newName.trim() || !fixtureId}>
+              Assign
+            </Button>
+          </div>
+        </form>
+      </div>
+
+      {/* Assignment list */}
+      {assignments.length > 0 && (
+        <div className="sk-assignment-list">
+          {assignments
+            .filter(a => a.active)
+            .map(a => {
+              const fixture = tournament.fixtures.find(f => f.id === a.fixtureId);
+              const home = fixture ? tournament.teams.find(t => t.id === fixture.homeTeamId) : null;
+              const away = fixture ? tournament.teams.find(t => t.id === fixture.awayTeamId) : null;
+
+              return (
+                <div key={a.id} className="sk-assignment-row">
+                  <div className="sk-assignment-info">
+                    <span className="sk-assignment-name">{a.scorekeeperName}</span>
+                    <span className="sk-assignment-fixture">
+                      {fixture
+                        ? `R${fixture.round}${fixture.court ? ` C${fixture.court}` : ''}: ${home?.name || 'TBD'} vs ${away?.name || 'TBD'}`
+                        : 'Fixture not found'}
+                    </span>
+                  </div>
+                  <div className="sk-assignment-actions">
+                    <Link
+                      to={`/admin/scorecard/${tournament.id}/${a.fixtureId}`}
+                      className="btn btn-ghost btn-sm"
+                      title="Open scorecard"
+                    >
+                      <ExternalLink size={13} />
+                    </Link>
+                    <Button variant="ghost" size="sm" icon={<X size={13} />}
+                      onClick={() => handleRemove(a.id)}
+                      title="Remove assignment"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+      )}
+
+      {assignments.filter(a => a.active).length === 0 && (
+        <p className="admin-empty">No scorekeepers assigned yet.</p>
       )}
     </section>
   );

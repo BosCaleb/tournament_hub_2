@@ -29,6 +29,9 @@ export function createTournament(overrides = {}) {
     playoffFlows: [],          // array of { id, name, matches[] } playoff flows
     rankingLists: [],          // array of { id, name, teamIds[] } custom ranked lists
     deletedItems: { teams: [], fixtures: [], players: [] }, // soft-delete recycle bin
+    // ─── Scorekeeper fields ───────────────────────────────────────
+    scorekeeperCode: '',       // short code shared with scorekeepers for login
+    scorekeeperAssignments: [], // [{ id, fixtureId, scorekeeperName, active, assignedAt }]
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...overrides,

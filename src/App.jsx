@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { TournamentProvider, useTournamentContext } from './context/TournamentContext.jsx';
 import { AdminAuthProvider, useAdminAuth } from './context/AdminAuthContext.jsx';
+import { ScorekeeperProvider, useScorekeeperAuth } from './context/ScorekeeperContext.jsx';
 import { StatEdgeIcon } from './components/ui/StatEdgeLogo.jsx';
 
 import { LandingPage } from './pages/LandingPage.jsx';
@@ -10,6 +11,11 @@ import { TournamentPage } from './pages/TournamentPage.jsx';
 import { AdminLoginPage } from './pages/AdminLoginPage.jsx';
 import { AdminDashboardPage } from './pages/AdminDashboardPage.jsx';
 import { NotFoundPage } from './pages/NotFoundPage.jsx';
+import { ScorekeeperLoginPage } from './pages/ScorekeeperLoginPage.jsx';
+import { ScorekeeperDashboardPage } from './pages/ScorekeeperDashboardPage.jsx';
+import { LiveScorecardPage } from './pages/LiveScorecardPage.jsx';
+import { TemplateListPage } from './pages/TemplateListPage.jsx';
+import { TemplateBuilderPage } from './pages/TemplateBuilderPage.jsx';
 
 /** Full-screen loading spinner shown while Supabase hydrates */
 function DbLoadingScreen() {
@@ -60,42 +66,99 @@ function RequireAdmin({ children }) {
   return children;
 }
 
+/** Redirects to /scorekeeper if not logged in as scorekeeper */
+function RequireScorekeeper({ children }) {
+  const { isLoggedIn } = useScorekeeperAuth();
+  const location = useLocation();
+  if (!isLoggedIn) {
+    return <Navigate to="/scorekeeper" state={{ from: location }} replace />;
+  }
+  return children;
+}
+
 export default function App() {
   return (
     <TournamentProvider>
       <AdminAuthProvider>
-        <BrowserRouter>
-          <DbLoadingScreen />
-          <Routes>
-            {/* ── Public / Viewer routes ─────────────────────── */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/sports" element={<SportSelectorPage />} />
-            <Route path="/sports/:sport" element={<TournamentListPage />} />
-            <Route path="/sports/:sport/:id" element={<TournamentPage isAdmin={false} />} />
+        <ScorekeeperProvider>
+          <BrowserRouter>
+            <DbLoadingScreen />
+            <Routes>
+              {/* ── Public / Viewer routes ─────────────────────── */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/sports" element={<SportSelectorPage />} />
+              <Route path="/sports/:sport" element={<TournamentListPage />} />
+              <Route path="/sports/:sport/:id" element={<TournamentPage isAdmin={false} />} />
 
-            {/* ── Admin routes ───────────────────────────────── */}
-            <Route path="/admin" element={<AdminLoginPage />} />
-            <Route
-              path="/admin/dashboard"
-              element={
-                <RequireAdmin>
-                  <AdminDashboardPage />
-                </RequireAdmin>
-              }
-            />
-            <Route
-              path="/admin/:sport/:id"
-              element={
-                <RequireAdmin>
-                  <TournamentPage isAdmin={true} />
-                </RequireAdmin>
-              }
-            />
+              {/* ── Admin routes ───────────────────────────────── */}
+              <Route path="/admin" element={<AdminLoginPage />} />
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <RequireAdmin>
+                    <AdminDashboardPage />
+                  </RequireAdmin>
+                }
+              />
+              <Route
+                path="/admin/:sport/:id"
+                element={
+                  <RequireAdmin>
+                    <TournamentPage isAdmin={true} />
+                  </RequireAdmin>
+                }
+              />
 
-            {/* ── Catch-all ─────────────────────────────────── */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </BrowserRouter>
+              {/* ── Admin scorecard + template routes ──────────── */}
+              <Route
+                path="/admin/templates"
+                element={
+                  <RequireAdmin>
+                    <TemplateListPage />
+                  </RequireAdmin>
+                }
+              />
+              <Route
+                path="/admin/templates/:id"
+                element={
+                  <RequireAdmin>
+                    <TemplateBuilderPage />
+                  </RequireAdmin>
+                }
+              />
+              <Route
+                path="/admin/scorecard/:tournamentId/:fixtureId"
+                element={
+                  <RequireAdmin>
+                    <LiveScorecardPage isAdmin={true} />
+                  </RequireAdmin>
+                }
+              />
+
+              {/* ── Scorekeeper routes ──────────────────────────── */}
+              <Route path="/scorekeeper" element={<ScorekeeperLoginPage />} />
+              <Route
+                path="/scorekeeper/dashboard"
+                element={
+                  <RequireScorekeeper>
+                    <ScorekeeperDashboardPage />
+                  </RequireScorekeeper>
+                }
+              />
+              <Route
+                path="/scorekeeper/match/:tournamentId/:fixtureId"
+                element={
+                  <RequireScorekeeper>
+                    <LiveScorecardPage isAdmin={false} />
+                  </RequireScorekeeper>
+                }
+              />
+
+              {/* ── Catch-all ─────────────────────────────────── */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </BrowserRouter>
+        </ScorekeeperProvider>
       </AdminAuthProvider>
     </TournamentProvider>
   );

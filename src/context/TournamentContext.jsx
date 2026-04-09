@@ -246,6 +246,26 @@ export function reducer(state, action) {
         ),
       }));
 
+    // ─── Scorekeeper assignments ───────────────────────────────
+    case 'SET_SCOREKEEPER_CODE':
+      return patchTournament(state, action.payload.tournamentId, t => ({
+        ...t, scorekeeperCode: action.payload.code,
+      }));
+
+    case 'ADD_SCOREKEEPER_ASSIGNMENT':
+      return patchTournament(state, action.payload.tournamentId, t => ({
+        ...t,
+        scorekeeperAssignments: [...(t.scorekeeperAssignments || []), action.payload.assignment],
+      }));
+
+    case 'REMOVE_SCOREKEEPER_ASSIGNMENT':
+      return patchTournament(state, action.payload.tournamentId, t => ({
+        ...t,
+        scorekeeperAssignments: (t.scorekeeperAssignments || []).map(a =>
+          a.id === action.payload.assignmentId ? { ...a, active: false } : a
+        ),
+      }));
+
     // ─── Custom ranking lists ──────────────────────────────────
     case 'ADD_RANKING_LIST': {
       const list = { id: generateId(), name: 'Custom Ranking', teamIds: [], ...action.payload.list };

@@ -1,0 +1,188 @@
+.score-controls {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: 0;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.score-controls-divider {
+  width: 1px;
+  background: var(--color-border);
+}
+
+/* Score panel */
+.score-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+}
+
+/* Team label */
+.score-panel-team {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.score-panel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--team-color, var(--color-border));
+  flex-shrink: 0;
+}
+
+.score-panel-name {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  max-width: 130px;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+/* Score display */
+.score-panel-score {
+  font-family: var(--font-display);
+  font-size: 5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+  min-width: 3ch;
+  text-align: center;
+  transition: transform var(--transition-fast), color var(--transition-fast);
+}
+
+.score-panel-score:has(~ .score-panel-btns .score-btn--add:active) {
+  transform: scale(1.08);
+}
+
+/* Buttons */
+.score-panel-btns {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.score-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-weight: 700;
+  font-family: var(--font-display);
+  transition: all var(--transition-fast);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Large add button */
+.score-btn--add {
+  width: 100%;
+  padding: var(--space-4) var(--space-4);
+  font-size: var(--text-lg);
+  background: var(--brand-orange);
+  color: #fff;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--brand-orange) 40%, transparent);
+  letter-spacing: 0.02em;
+}
+
+.score-btn--add:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--brand-orange) 85%, #000);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--brand-orange) 50%, transparent);
+}
+
+.score-btn--add:active:not(:disabled) {
+  transform: scale(0.96);
+  box-shadow: none;
+}
+
+/* Undo button */
+.score-btn--remove {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.score-btn--remove:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.score-btn--remove:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.score-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Compact variant */
+.score-controls--compact .score-panel {
+  padding: var(--space-4) var(--space-3);
+  gap: var(--space-2);
+}
+
+.score-controls--compact .score-panel-score {
+  font-size: 3rem;
+}
+
+.score-btn--compact {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: var(--radius-md);
+}
+
+.score-controls--compact .score-panel-btns {
+  flex-direction: row;
+}
+
+.score-controls--compact .score-btn--add.score-btn--compact {
+  background: var(--brand-orange);
+  color: #fff;
+}
+
+/* Tablet breakpoint: even larger targets */
+@media (min-width: 768px) {
+  .score-panel {
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .score-panel-score {
+    font-size: 6rem;
+  }
+
+  .score-btn--add {
+    padding: var(--space-5) var(--space-6);
+    font-size: var(--text-xl);
+  }
+
+  .score-panel-name {
+    font-size: var(--text-base);
+    max-width: 160px;
+  }
+}

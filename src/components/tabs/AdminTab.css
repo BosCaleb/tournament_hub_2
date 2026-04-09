@@ -253,3 +253,84 @@
   border-radius: var(--radius-full);
   padding: 1px 8px; font-size: 11px; font-weight: 700;
 }
+
+/* ── Scorekeepers section ───────────────────────────────────────────────────── */
+
+.admin-nav-external {
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.admin-nav-item--external {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.admin-subsection {
+  margin-top: var(--space-5);
+}
+
+.admin-subsection-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: var(--space-1) 0 var(--space-3);
+}
+
+.sk-code-form { margin-top: var(--space-3); }
+
+.sk-code-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.sk-assign-form { margin-top: var(--space-3); }
+
+.sk-assignment-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.sk-assignment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.sk-assignment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sk-assignment-name {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+}
+
+.sk-assignment-fixture {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sk-assignment-actions {
+  display: flex;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
