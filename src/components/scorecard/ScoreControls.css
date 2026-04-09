@@ -47,7 +47,7 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   max-width: 130px;
-  word-break: break-word;
+  overflow-wrap: break-word;
   line-height: 1.2;
 }
 
