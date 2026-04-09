@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AdminAuthProvider, useAdminAuth } from './AdminAuthContext.jsx';
@@ -70,10 +70,13 @@ describe('AdminAuthContext — no PIN set', () => {
 });
 
 describe('AdminAuthContext — PIN set', () => {
-  beforeEach(async () => {
+  let storedPinHash;
+  beforeAll(async () => {
+    storedPinHash = await hashPin('1234');
+  });
+  beforeEach(() => {
     sessionStorage.removeItem(SESSION_KEY);
-    const pinHash = await hashPin('1234');
-    localStorage.setItem(CONFIG_KEY, JSON.stringify({ pinHash }));
+    localStorage.setItem(CONFIG_KEY, JSON.stringify({ pinHash: storedPinHash }));
   });
 
   it('hasPin is true when PIN is configured', () => {
