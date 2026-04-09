@@ -15,9 +15,9 @@
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
-  ChevronLeft, Play, Pause, Flag, RotateCcw,
+  ChevronLeft, Play, Pause, Flag,
   PenLine, Check, AlertTriangle, RefreshCw, Lock
 } from 'lucide-react';
 import { useTournamentContext } from '../context/TournamentContext.jsx';
@@ -48,7 +48,6 @@ const offlineQueue = [];
 
 export function LiveScorecardPage({ isAdmin = false }) {
   const { tournamentId, fixtureId } = useParams();
-  const navigate = useNavigate();
 
   const { state } = useTournamentContext();
   const skAuth = useScorekeeperAuth();
@@ -99,7 +98,6 @@ export function LiveScorecardPage({ isAdmin = false }) {
   const [showFinaliseModal, setShowFinaliseModal] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [noteText, setNoteText]         = useState('');
-  const [showQuarterModal, setShowQuarterModal] = useState(false);
 
   // Sequence counter (use ref to avoid stale closures in callbacks)
   const seqRef = useRef(0);
@@ -178,19 +176,7 @@ export function LiveScorecardPage({ isAdmin = false }) {
   }, [fixtureId]);
 
   // ── Process offline queue on reconnect ─────────────────────────────────────
-  useEffect(() => {
-    function handleOnline() {
-      if (offlineQueue.length > 0) {
-        setSyncStatus('reconnecting');
-        processQueue();
-      }
-    }
-
-    window.addEventListener('online', handleOnline);
-    return () => window.removeEventListener('online', handleOnline);
-  }, []);
-
-  async function processQueue() {
+  const processQueue = useCallback(async () => {
     while (offlineQueue.length > 0) {
       const event = offlineQueue[0];
       const result = await insertScoreEvent(event);
@@ -202,7 +188,19 @@ export function LiveScorecardPage({ isAdmin = false }) {
       }
     }
     setSyncStatus('synced');
-  }
+  }, []);
+
+  useEffect(() => {
+    function handleOnline() {
+      if (offlineQueue.length > 0) {
+        setSyncStatus('reconnecting');
+        processQueue();
+      }
+    }
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [processQueue]);
 
   // ── Core scoring action ─────────────────────────────────────────────────────
   const dispatchScoringEvent = useCallback(async (eventType, teamSide = null, payload = {}) => {

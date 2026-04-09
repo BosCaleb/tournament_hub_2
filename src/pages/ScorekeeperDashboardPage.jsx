@@ -14,17 +14,15 @@ export function ScorekeeperDashboardPage() {
   const auth = useScorekeeperAuth();
   const navigate = useNavigate();
 
-  if (!auth.isLoggedIn) {
-    navigate('/scorekeeper', { replace: true });
-    return null;
-  }
-
   const { session } = auth;
 
-  // Find the tournament for this session
-  const tournament = state.tournaments.find(t => t.id === session.tournamentId);
+  // Find the tournament for this session (null if not logged in yet)
+  const tournament = useMemo(
+    () => session ? state.tournaments.find(t => t.id === session.tournamentId) : null,
+    [state.tournaments, session]
+  );
 
-  // Get assigned fixture IDs
+  // Get assigned fixture IDs — all hooks must come before any early return
   const assignedFixtureIds = useMemo(() =>
     auth.getAssignedFixtureIds(tournament),
     [auth, tournament]
@@ -70,6 +68,12 @@ export function ScorekeeperDashboardPage() {
         return da.localeCompare(db);
       });
   }, [tournament, assignedFixtureIds]);
+
+  // Guard after all hooks
+  if (!auth.isLoggedIn) {
+    navigate('/scorekeeper', { replace: true });
+    return null;
+  }
 
   function handleLogout() {
     auth.logout();

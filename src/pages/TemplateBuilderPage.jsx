@@ -13,19 +13,17 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ChevronLeft, Save, Eye, Palette, Layout, List,
-  ChevronUp, ChevronDown, Plus, Minus, Check, Star,
+  ChevronUp, ChevronDown, Check, Star,
   AlertTriangle
 } from 'lucide-react';
 import { Button } from '../components/ui/Button.jsx';
 import { FormField, Input, Select } from '../components/ui/FormField.jsx';
-import { Badge } from '../components/ui/Badge.jsx';
 import { loadTemplate, upsertTemplate } from '../lib/db_scorecard.js';
 import {
   DEFAULT_BRANDING, DEFAULT_LAYOUT, DEFAULT_FIELDS,
   FIELD_LABELS,
 } from '../lib/scorecard.js';
 import { AGE_GROUPS } from '../lib/types.js';
-import { generateId } from '../lib/utils.js';
 import './TemplateBuilderPage.css';
 
 const SCOPE_OPTIONS = [

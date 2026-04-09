@@ -5,17 +5,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Edit2, Copy, Archive, Star, Globe, Trophy, ChevronLeft } from 'lucide-react';
-import { useAdminAuth } from '../context/AdminAuthContext.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Badge } from '../components/ui/Badge.jsx';
 import { ConfirmDialog } from '../components/ui/Modal.jsx';
 import { loadTemplates, deleteTemplate, duplicateTemplate } from '../lib/db_scorecard.js';
-import { DEFAULT_TEMPLATE } from '../lib/scorecard.js';
 import { StatEdgeIcon } from '../components/ui/StatEdgeLogo.jsx';
 import './TemplateListPage.css';
 
 export function TemplateListPage() {
-  const adminAuth = useAdminAuth();
   const navigate = useNavigate();
 
   const [templates, setTemplates] = useState([]);
