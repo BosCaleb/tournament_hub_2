@@ -9,6 +9,24 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
+  // ↓↓↓ Added for Docker-on-Windows dev. No-op outside containers.
+  server: {
+    host: true,        // bind 0.0.0.0 so the port is reachable from the host
+    port: 5173,
+    strictPort: true,
+    watch: {
+      // Polling is required because filesystem events don't reliably cross
+      // the Windows → WSL2 → container bind-mount boundary
+      usePolling: true,
+      interval: 100,
+    },
+  },
+  preview: {
+    host: true,
+    port: 4173,
+    strictPort: true,
+  },
+  // ↑↑↑
   test: {
     globals: true,
     environment: 'jsdom',
